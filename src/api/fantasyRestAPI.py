@@ -3,7 +3,7 @@
 import time
 from flask import Flask, request, jsonify
 from flask_cors import CORS
-from src.util.logger import Logger
+from ..util.logger import Logger
 
 app = Flask(__name__)
 CORS(app)
@@ -34,4 +34,4 @@ def get_player_info():
     return jsonify(player_id)
 
 if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=5000, debug=True)
+    app.run(host='0.0.0.0', port=5001, debug=True)
