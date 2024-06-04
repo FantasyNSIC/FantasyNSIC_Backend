@@ -11,8 +11,13 @@ DISCLAIMER: This application and project is meant for recreational use and it no
 **Pre-Requisites**
 
 Python 3.12: https://www.python.org/downloads/release/python-3120/  
-Visual Studio Code: https://code.visualstudio.com/download  
+Visual Studio Code: https://code.visualstudio.com/download
+Postgres: https://www.postgresql.org/download/
 GitHub Desktop (Optional): https://desktop.github.com/
+
+For Postgres on MAC, Hombrew my be required. To install Hombrew, run the shell command:
+`/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"`
+Follow the steps given in the terminal and then run `brew install postgresql` to install Postgres.
 
 **Development Environment Setup**
 1. Install the above pre-requisites.

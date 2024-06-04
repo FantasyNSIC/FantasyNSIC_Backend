@@ -29,7 +29,9 @@ def connect_to_fantasyDB():
         # Return connection
         return conn
 
-    except Exception as e:
-        print(f"Error: {e}")
+    except psycopg2.Error as e:
+        print("Unable to connect to the database")
+        print(e.pgerror)
+        print(e.diag.message_detail)
         if conn is not None:
             conn.close()
