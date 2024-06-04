@@ -14,7 +14,7 @@ logger = Logger()
 def get_available_players():
     # Fetch available players from the database.
     league_id = int(request.args.get('league_id'))
-    return jsonify(available_players_service(league_id))
+    return available_players_service(league_id).toJson()
 
 @app.route('/db/getUserTeam', methods=['GET'])
 def get_team_info():
