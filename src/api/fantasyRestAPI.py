@@ -4,10 +4,17 @@ import time
 from flask import Flask, request, jsonify
 from flask_cors import CORS
 from ..util.logger import Logger
+from ..service.getDBService import *
 
 app = Flask(__name__)
 CORS(app)
 logger = Logger()
+
+@app.route('/db/getAvailablePlayers', methods=['GET'])
+def get_available_players():
+    # Fetch available players from the database.
+    league_id = int(request.args.get('league_id'))
+    return available_players_service(league_id).toJson()
 
 @app.route('/db/getUserTeam', methods=['GET'])
 def get_team_info():

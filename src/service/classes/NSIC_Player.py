@@ -15,8 +15,8 @@ class NSIC_Player:
                  team_id: int,
                  pos: str,
                  cls: str,
-                 jersey_number: str,
-                 height: int,
+                 jersey_number: int,
+                 height: str,
                  weight: int) -> None:
         """
         Initializes a player object.
@@ -128,35 +128,35 @@ class NSIC_Player:
         self._cls = cls
 
     @property
-    def jersey_number(self) -> str:
+    def jersey_number(self) -> int:
         """
         Returns the player's jersey number.
         """
         return self._jersey_number
     
     @jersey_number.setter
-    def jersey_number(self, jersey_number: str) -> None:
+    def jersey_number(self, jersey_number: int) -> None:
         """
         Sets the player's jersey number.
         """
-        if not isinstance(jersey_number, str):
-            raise ValueError("Jersey number must be a string.")
+        if not isinstance(jersey_number, int):
+            raise ValueError("Jersey number must be a integer.")
         self._jersey_number = jersey_number
 
     @property
-    def height(self) -> int:
+    def height(self) -> str:
         """
         Returns the player's height.
         """
         return self._height
     
     @height.setter
-    def height(self, height: int) -> None:
+    def height(self, height: str) -> None:
         """
         Sets the player's height.
         """
-        if not isinstance(height, int):
-            raise ValueError("Height must be an integer.")
+        if not isinstance(height, str):
+            raise ValueError("Height must be an string.")
         self._height = height
 
     @property
@@ -206,4 +206,21 @@ class NSIC_Player:
             jersey_number=json["jersey_number"],
             height=json["height"],
             weight=json["weight"]
+        )
+    
+    @classmethod
+    def from_tuple(cls, tuple: tuple) -> "NSIC_Player":
+        """
+        Returns a player object from a tuple representation.
+        """
+        return cls(
+            player_id=tuple[0],
+            first_name=tuple[1],
+            last_name=tuple[2],
+            team_id=tuple[3],
+            pos=tuple[4],
+            cls=tuple[5],
+            jersey_number=tuple[6],
+            height=tuple[7],
+            weight=tuple[8]
         )
