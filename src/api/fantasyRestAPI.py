@@ -10,17 +10,30 @@ app = Flask(__name__)
 CORS(app)
 logger = Logger()
 
+@app.route('/db/getMyTeamInfo', methods=['GET'])
+def get_team_roster():
+    # Fetch user-team info and roster from the database.
+    user_team_id = request.args.get('user_team_id')
+    league_id = request.args.get('league_id')
+    return my_team_information_service(user_team_id, league_id).toJson()
+
 @app.route('/db/getAvailablePlayers', methods=['GET'])
 def get_available_players():
     # Fetch available players from the database.
     league_id = int(request.args.get('league_id'))
     return available_players_service(league_id).toJson()
 
-@app.route('/db/getUserTeam', methods=['GET'])
-def get_team_info():
+@app.route('/db/getMatchupInfo', methods=['GET'])
+def get_matchup_info():
     # Fetch team information from the database.
     team_id = request.args.get('team_id')
     return jsonify(team_id)
+
+@app.route('/db/getScoreboardInfo', methods=['GET'])
+def get_scoreboard_info():
+    # Fetch league information from the database.
+    league_id = request.args.get('league_id')
+    return jsonify(league_id)
 
 @app.route('/db/getLeagueInfo', methods=['GET'])
 def get_league_info():
@@ -28,11 +41,11 @@ def get_league_info():
     league_id = request.args.get('league_id')
     return jsonify(league_id)
 
-@app.route('/db/getTeamRoster', methods=['GET'])
-def get_team_roster():
-    # Fetch team roster from the database.
-    team_id = request.args.get('team_id')
-    return jsonify(team_id)
+@app.route('/db/getStandingsInfo', methods=['GET'])
+def get_standings_info():
+    # Fetch standings information from the database.
+    league_id = request.args.get('league_id')
+    return jsonify(league_id)
 
 @app.route('/db/getPlayerInfo', methods=['POST'])
 def get_player_info():
