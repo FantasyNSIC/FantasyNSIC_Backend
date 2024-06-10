@@ -6,7 +6,7 @@ class MyTeamInfoResponse:
                  teamName: str,
                  leagueName: str,
                  leagueConstraint: str,
-                 userName: str,
+                 fullName: str,
                  wins: int,
                  losses: int,
                  roster: UserRoster) -> None:
@@ -14,7 +14,7 @@ class MyTeamInfoResponse:
         self.teamName = teamName
         self.leagueName = leagueName
         self.leagueConstraint = leagueConstraint
-        self.userName = userName
+        self.fullName = fullName
         self.wins = wins
         self.losses = losses
         self.roster = roster
@@ -55,17 +55,17 @@ class MyTeamInfoResponse:
         """
         self.leagueConstraint = leagueConstraint
 
-    def get_userName(self) -> str:
+    def get_fullName(self) -> str:
         """
         Get the user name.
         """
-        return self.userName
+        return self.fullName
 
-    def set_userName(self, userName: str) -> None:
+    def set_fullName(self, fullName: str) -> None:
         """
         Set the user name.
         """
-        self.userName = userName
+        self.fullName = fullName
 
     def get_wins(self) -> int:
         """

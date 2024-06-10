@@ -44,7 +44,8 @@ class UserRoster:
         Returns:
             str: The JSON representation of the roster.
         """
-        return json.dumps(self.roster, default=lambda o: o.to_dict() if hasattr(o, 'to_dict') else o.__dict__)
+        return [{'player': player['player'].to_json() if hasattr(player['player'], 'to_json') else player['player'],
+                 'status': player['status']} for player in self.roster]
     
     @staticmethod
     def from_tuple(tuple):
