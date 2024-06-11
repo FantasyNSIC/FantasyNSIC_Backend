@@ -19,89 +19,103 @@ class MyTeamInfoResponse:
         self.losses = losses
         self.roster = roster
 
-    def get_teamName(self) -> str:
+    @property
+    def teamName(self) -> str:
         """
         Get the team name.
         """
-        return self.teamName
+        return self._teamName
 
-    def set_teamName(self, teamName: str) -> None:
+    @teamName.setter
+    def teamName(self, teamName: str) -> None:
         """
         Set the team name.
         """
-        self.teamName = teamName
+        self._teamName = teamName
 
-    def get_leagueName(self) -> str:
+    @property
+    def leagueName(self) -> str:
         """
         Get the league name.
         """
-        return self.leagueName
+        return self._leagueName
 
-    def set_leagueName(self, leagueName: str) -> None:
+    @leagueName.setter
+    def leagueName(self, leagueName: str) -> None:
         """
         Set the league name.
         """
-        self.leagueName = leagueName
+        self._leagueName = leagueName
 
-    def get_leagueConstraint(self) -> str:
+    @property
+    def leagueConstraint(self) -> str:
         """
         Get the league constraint.
         """
-        return self.leagueConstraint
+        return self._leagueConstraint
 
-    def set_leagueConstraint(self, leagueConstraint: str) -> None:
+    @leagueConstraint.setter
+    def leagueConstraint(self, leagueConstraint: str) -> None:
         """
         Set the league constraint.
         """
-        self.leagueConstraint = leagueConstraint
+        self._leagueConstraint = leagueConstraint
 
-    def get_fullName(self) -> str:
+    @property
+    def fullName(self) -> str:
         """
         Get the user name.
         """
-        return self.fullName
+        return self._fullName
 
-    def set_fullName(self, fullName: str) -> None:
+    @fullName.setter
+    def fullName(self, fullName: str) -> None:
         """
         Set the user name.
         """
-        self.fullName = fullName
+        self._fullName = fullName
 
-    def get_wins(self) -> int:
+    @property
+    def wins(self) -> int:
         """
         Get the number of wins.
         """
-        return self.wins
+        return self._wins
 
-    def set_wins(self, wins: int) -> None:
+    @wins.setter
+    def wins(self, wins: int) -> None:
         """
         Set the number of wins.
         """
-        self.wins = wins
+        self._wins = wins
 
-    def get_losses(self) -> int:
+    @property
+    def losses(self) -> int:
         """
         Get the number of losses.
         """
-        return self.losses
+        return self._losses
 
-    def set_losses(self, losses: int) -> None:
+    @losses.setter
+    def losses(self, losses: int) -> None:
         """
         Set the number of losses.
         """
-        self.losses = losses
+        self._losses = losses
 
-    def get_roster(self) -> UserRoster:
+    @property
+    def roster(self) -> UserRoster:
         """
         Get the user roster.
         """
-        return self.roster
+        return self._roster
 
-    def set_roster(self, roster: UserRoster) -> None:
+    @roster.setter
+    def roster(self, roster: UserRoster) -> None:
         """
         Set the user roster.
         """
-        self.roster = roster
+        self._roster = roster
         
     def toJson(self) -> str:
         """
