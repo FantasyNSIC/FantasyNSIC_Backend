@@ -191,6 +191,15 @@ class NSIC_Player:
             "weight": self.weight
         }
     
+    def to_dict(self):
+        """
+        Convert the player to a dictionary.
+
+        Returns:
+            dict: The dictionary representation of the player.
+        """
+        return self.__dict__
+    
     @classmethod
     def from_json(cls, json: dict) -> "NSIC_Player":
         """
