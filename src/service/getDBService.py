@@ -5,6 +5,7 @@ from .classes.NSIC_Player import NSIC_Player
 from .classes.User_Roster import UserRoster
 from .classes.responses.MyTeamInfoResponse import MyTeamInfoResponse
 from .classes.responses.AvailablePlayersResponse import AvailablePlayersResponse
+from .classes.responses.LeagueInfoResponse import LeagueInfoResponse
 
 def my_team_information_service(user_team_id):
     """
@@ -71,3 +72,41 @@ def available_players_service(league_id):
         conn.close()
     available_players = AvailablePlayersResponse.from_tuple(fetched_players)
     return available_players
+
+def league_information_service(league_id):
+    """
+    Fetches league information from the database.
+    :param league_id: The ID of the user's league.
+    """
+    # Initialize empty response object.
+    league_info = LeagueInfoResponse('', '', [])
+    res_league_info = None
+    res_league_tuples = []
+    conn = connect_to_fantasyDB()
+    cur = conn.cursor()
+
+    # Execute queries to get league information.
+    try:
+        # Get league name and constraint.
+        with open('src/queries/get_league_information.sql', 'r') as sql:
+            query = sql.read()
+        cur.execute(query, (league_id,))
+        res_league_info = cur.fetchone()
+        res_league_tuples.append(res_league_info)
+
+        # Get league teams, form league info response object.
+        with open('src/queries/get_league_teams.sql', 'r') as sql:
+            query = sql.read()
+        cur.execute(query, (league_id,))
+        res_teams = cur.fetchall()
+        res_league_tuples.append(res_teams)
+
+    except Exception as e:
+        print(e)
+    finally:
+        cur.close()
+        conn.close()
+    if res_league_info is not None:
+        league_info = LeagueInfoResponse.from_tuple(res_league_tuples)
+        return league_info
+    return league_info
