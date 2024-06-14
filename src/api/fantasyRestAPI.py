@@ -44,7 +44,7 @@ def get_league_info():
 def get_standings_info():
     # Fetch standings information from the database.
     league_id = request.args.get('league_id')
-    return jsonify(league_id)
+    return standings_information_service(league_id).toJson()
 
 @app.route('/db/getPlayerInfo', methods=['POST'])
 def get_player_info():
