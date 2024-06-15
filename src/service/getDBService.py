@@ -6,6 +6,7 @@ from .classes.User_Roster import UserRoster
 from .classes.responses.MyTeamInfoResponse import MyTeamInfoResponse
 from .classes.responses.AvailablePlayersResponse import AvailablePlayersResponse
 from .classes.responses.LeagueInfoResponse import LeagueInfoResponse
+from .classes.responses.StandingsInfoResponse import StandingsInfoResponse
 
 def my_team_information_service(user_team_id):
     """
@@ -55,7 +56,7 @@ def available_players_service(league_id):
     :param league_id: The ID of the user's league.
     """
     # Read SQL query from file, connect to DB.
-    available_players = []
+    available_players = AvailablePlayersResponse([])
     with open('src/queries/get_available_players.sql', 'r') as sql:
         query = sql.read()
     conn = connect_to_fantasyDB()
@@ -110,3 +111,28 @@ def league_information_service(league_id):
         league_info = LeagueInfoResponse.from_tuple(res_league_tuples)
         return league_info
     return league_info
+
+def standings_information_service(league_id):
+    """
+    Fetches standings information from the database.
+    :param league_id: The ID of the user's league.
+    """
+    # Read SQL query from file, connect to DB.
+    standings = StandingsInfoResponse([])
+    with open('src/queries/get_standings_information.sql', 'r') as sql:
+        query = sql.read()
+    conn = connect_to_fantasyDB()
+    cur = conn.cursor()
+
+    # Execute query to get standings.
+    try:
+        cur.execute(query, (league_id,))
+        fetched_standings = cur.fetchall()
+    except Exception as e:
+        print(e)
+    finally:
+        cur.close()
+        conn.close()
+    print(fetched_standings)
+    standings = StandingsInfoResponse.from_tuple(fetched_standings)
+    return standings

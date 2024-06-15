@@ -12,7 +12,8 @@ class Team_Record:
                  wins: int,
                  losses: int,
                  points_for: float,
-                 points_against: float) -> None:
+                 points_against: float,
+                 user_team_name: str = None) -> None:
         """
         Initializes a team record object.
         """
@@ -21,6 +22,7 @@ class Team_Record:
         self.losses = losses
         self.points_for = points_for
         self.points_against = points_against
+        self.user_team_name = user_team_name
 
     @property
     def user_team_id(self) -> int:
@@ -102,10 +104,35 @@ class Team_Record:
             raise ValueError("Points against must be a float.")
         self._points_against = points_against
 
+    @property
+    def user_team_name(self) -> str:
+        """
+        Returns the user team's name.
+        """
+        return self._user_team_name
+    
+    @user_team_name.setter
+    def user_team_name(self, user_team_name: str) -> None:
+        """
+        Sets the user team's name.
+        """
+        if not isinstance(user_team_name, str):
+            raise ValueError("User team name must be a string.")
+        self._user_team_name = user_team_name
+
     def to_json(self) -> dict:
         """
         Returns a JSON representation of the team record.
         """
+        if self.user_team_name is not None:
+            return {
+                'user_team_id': self.user_team_id,
+                'wins': self.wins,
+                'losses': self.losses,
+                'points_for': self.points_for,
+                'points_against': self.points_against,
+                'user_team_name': self.user_team_name
+            }
         return {
             'user_team_id': self.user_team_id,
             'wins': self.wins,
@@ -119,9 +146,26 @@ class Team_Record:
         """
         Creates a team record object from a JSON object.
         """
+        if 'user_team_name' in data:
+            return cls(data['user_team_id'],
+                   data['wins'],
+                   data['losses'],
+                   data['points_for'],
+                   data['points_against'],
+                   data['user_team_name']
+            )
         return cls(data['user_team_id'],
                    data['wins'],
                    data['losses'],
                    data['points_for'],
                    data['points_against']
         )
+    
+    @classmethod
+    def from_tuple(cls, data: tuple) -> 'Team_Record':
+        """
+        Creates a team record object from a tuple.
+        """
+        if len(data) == 6:
+            return cls(data[0], data[1], data[2], float(data[3]), float(data[4]), data[5])
+        return cls(data[0], data[1], data[2], float(data[3]), float(data[4]))
