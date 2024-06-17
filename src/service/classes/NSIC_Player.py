@@ -175,6 +175,23 @@ class NSIC_Player:
             raise ValueError("Weight must be an integer.")
         self._weight = weight
 
+    @classmethod
+    def empty_player(cls) -> "NSIC_Player":
+        """
+        Returns an empty player object.
+        """
+        return cls(
+            player_id=0,
+            first_name="",
+            last_name="",
+            team_id=0,
+            pos="",
+            cls="",
+            jersey_number=0,
+            height="",
+            weight=0
+        )
+
     def to_json(self) -> dict:
         """
         Returns a JSON representation of the player.
