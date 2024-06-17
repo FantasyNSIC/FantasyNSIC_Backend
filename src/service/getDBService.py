@@ -7,6 +7,7 @@ from .classes.responses.MyTeamInfoResponse import MyTeamInfoResponse
 from .classes.responses.AvailablePlayersResponse import AvailablePlayersResponse
 from .classes.responses.LeagueInfoResponse import LeagueInfoResponse
 from .classes.responses.StandingsInfoResponse import StandingsInfoResponse
+from .service_handlers.myTeamRosterHandle import handle_roster_creation
 
 def my_team_information_service(user_team_id):
     """
@@ -15,8 +16,11 @@ def my_team_information_service(user_team_id):
     :param league_id: The ID of the user's league.
     """
     # Initialize empty response object.
-    my_team_info = MyTeamInfoResponse('', '', '', '', 0, 0, None)
+    my_team_info = MyTeamInfoResponse('', '', '', 0, 0, UserRoster())
     res_team_info = None
+    formatted_roster = UserRoster()
+    overflowFlag = False
+    overflowPos = ""
     conn = connect_to_fantasyDB()
     cur = conn.cursor()
 
@@ -34,9 +38,11 @@ def my_team_information_service(user_team_id):
             query = sql.read()
         cur.execute(query, (user_team_id,))
         res_roster = cur.fetchall()
-        for player in res_roster:
-            new_player = NSIC_Player.from_tuple(player[1:])
-            roster.add_player(new_player, player[0])
+        handle_roster = handle_roster_creation(res_roster, res_team_info[0])
+        formatted_roster = handle_roster[0]
+        if handle_roster[1] != "":
+            overflowFlag = True
+            overflowPos = handle_roster[1]
 
     except Exception as e:
         print(e)
@@ -45,8 +51,8 @@ def my_team_information_service(user_team_id):
         conn.close()
     if res_team_info is not None:
         my_team_info = MyTeamInfoResponse(
-            res_team_info[0], res_team_info[1], res_team_info[2], res_team_info[3],
-            res_team_info[4], res_team_info[5], roster)
+            res_team_info[1], res_team_info[2], res_team_info[3], res_team_info[4],
+            res_team_info[5], formatted_roster, overflowFlag, overflowPos)
         return my_team_info
     return my_team_info
 

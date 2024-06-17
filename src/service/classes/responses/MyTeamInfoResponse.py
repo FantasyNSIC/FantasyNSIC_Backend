@@ -5,19 +5,21 @@ class MyTeamInfoResponse:
     def __init__(self,
                  teamName: str,
                  leagueName: str,
-                 leagueConstraint: str,
                  fullName: str,
                  wins: int,
                  losses: int,
-                 roster: UserRoster) -> None:
+                 roster: UserRoster,
+                 overflowFLag: bool = False,
+                 overflowPos: str = "") -> None:
         
         self.teamName = teamName
         self.leagueName = leagueName
-        self.leagueConstraint = leagueConstraint
         self.fullName = fullName
         self.wins = wins
         self.losses = losses
         self.roster = roster
+        self.overflowFlag = overflowFLag
+        self.overflowPos = overflowPos
 
     @property
     def teamName(self) -> str:
@@ -46,20 +48,6 @@ class MyTeamInfoResponse:
         Set the league name.
         """
         self._leagueName = leagueName
-
-    @property
-    def leagueConstraint(self) -> str:
-        """
-        Get the league constraint.
-        """
-        return self._leagueConstraint
-
-    @leagueConstraint.setter
-    def leagueConstraint(self, leagueConstraint: str) -> None:
-        """
-        Set the league constraint.
-        """
-        self._leagueConstraint = leagueConstraint
 
     @property
     def fullName(self) -> str:
@@ -116,9 +104,46 @@ class MyTeamInfoResponse:
         Set the user roster.
         """
         self._roster = roster
+
+    @property
+    def overflowFlag(self) -> bool:
+        """
+        Get the overflow flag.
+        """
+        return self._overflowFlag
+    
+    @overflowFlag.setter
+    def overflowFlag(self, overflowFlag: bool) -> None:
+        """
+        Set the overflow flag.
+        """
+        self._overflowFlag = overflowFlag
+
+    @property
+    def overflowPos(self) -> str:
+        """
+        Get the overflow position.
+        """
+        return self._overflowPos
+    
+    @overflowPos.setter
+    def overflowPos(self, overflowPos: str) -> None:
+        """
+        Set the overflow position.
+        """
+        self._overflowPos = overflowPos
         
     def toJson(self) -> str:
         """
         Convert the object to a JSON string.
         """
-        return json.dumps(self.__dict__, default=lambda o: o.toJson() if hasattr(o, 'toJson') else str(o))
+        return {
+            'teamName': self.teamName,
+            'leagueName': self.leagueName,
+            'fullName': self.fullName,
+            'wins': self.wins,
+            'losses': self.losses,
+            'roster': self.roster.to_json(),
+            'overflowFlag': self.overflowFlag,
+            'overflowPos': self.overflowPos
+        }
