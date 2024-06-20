@@ -12,7 +12,7 @@ class User_Team:
                  user_id: int,
                  team_name: str,
                  league_id: int,
-                 full_name: str = None) -> None:
+                 full_name: str = "") -> None:
         """
         Initializes a user-team object.
         """
@@ -106,7 +106,7 @@ class User_Team:
         """
         Returns a dictionary representation of the user-team object.
         """
-        if self.full_name is not None:
+        if self.full_name is not "":
             return {
                 "user_team_id": self.user_team_id,
                 "user_id": self.user_id,

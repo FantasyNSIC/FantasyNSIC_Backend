@@ -1,13 +1,14 @@
 """Service GET functions for getting data from the database"""
 
 from ..util.connection import connect_to_fantasyDB
-from .classes.NSIC_Player import NSIC_Player
 from .classes.User_Roster import UserRoster
 from .classes.responses.MyTeamInfoResponse import MyTeamInfoResponse
 from .classes.responses.AvailablePlayersResponse import AvailablePlayersResponse
+from .classes.responses.ScoreboardInfoResponse import ScoreboardInfoResponse
 from .classes.responses.LeagueInfoResponse import LeagueInfoResponse
 from .classes.responses.StandingsInfoResponse import StandingsInfoResponse
 from .service_handlers.myTeamRosterHandle import handle_roster_creation
+from .service_handlers.scoreboardMatchupHandle import format_weekly_matchups
 
 def my_team_information_service(user_team_id):
     """
@@ -33,7 +34,6 @@ def my_team_information_service(user_team_id):
         res_team_info = cur.fetchone()
 
         # Get team's roster, form roster object.
-        roster = UserRoster()
         with open('src/queries/get_my_team_roster_players.sql', 'r') as sql:
             query = sql.read()
         cur.execute(query, (user_team_id,))
@@ -79,6 +79,45 @@ def available_players_service(league_id):
         conn.close()
     available_players = AvailablePlayersResponse.from_tuple(fetched_players)
     return available_players
+
+def scorboard_information_service(league_id):
+    """
+    Fetches scoreboard information from the database.
+    :param league_id: The ID of the user's league.
+    """
+    # Initialize empty response object.
+    scoreboard_info = ScoreboardInfoResponse('', '', [])
+    res_scoreboard_info = None
+    formatted_matchups = []
+    conn = connect_to_fantasyDB()
+    cur = conn.cursor()
+
+    # Execute queries to get scoreboard information.
+    try:
+        # Get league name and current week.
+        with open('src/queries/get_scoreboard_information.sql', 'r') as sql:
+            query = sql.read()
+        cur.execute(query, (league_id,))
+        res_scoreboard_info = cur.fetchone()
+        current_week = res_scoreboard_info[1]
+
+        # Get weekly matchups, form scoreboard info response object.
+        with open('src/queries/get_scoreboard_weekly_matchups.sql', 'r') as sql:
+            query_temp = sql.read()
+        query = query_temp.format(current_week=current_week)
+        cur.execute(query, (league_id,))
+        res_matchups = cur.fetchall()
+        formatted_matchups = format_weekly_matchups(res_matchups)
+
+    except Exception as e:
+        print(e)
+    finally:
+        cur.close()
+        conn.close()
+    if res_scoreboard_info is not None:
+        scoreboard_info = ScoreboardInfoResponse(res_scoreboard_info[0], res_scoreboard_info[1], formatted_matchups)
+        return scoreboard_info
+    return scoreboard_info
 
 def league_information_service(league_id):
     """
@@ -139,6 +178,5 @@ def standings_information_service(league_id):
     finally:
         cur.close()
         conn.close()
-    print(fetched_standings)
     standings = StandingsInfoResponse.from_tuple(fetched_standings)
     return standings
