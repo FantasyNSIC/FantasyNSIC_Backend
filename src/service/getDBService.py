@@ -178,6 +178,5 @@ def standings_information_service(league_id):
     finally:
         cur.close()
         conn.close()
-    print(fetched_standings)
     standings = StandingsInfoResponse.from_tuple(fetched_standings)
     return standings
