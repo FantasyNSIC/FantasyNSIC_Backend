@@ -17,7 +17,8 @@ class NSIC_Player:
                  cls: str,
                  jersey_number: int,
                  height: str,
-                 weight: int) -> None:
+                 weight: int,
+                 total_points: float = 0.0) -> None:
         """
         Initializes a player object.
         """
@@ -30,6 +31,7 @@ class NSIC_Player:
         self.jersey_number = jersey_number
         self.height = height
         self.weight = weight
+        self.total_points = total_points
         
     @property
     def player_id(self) -> int:
@@ -175,6 +177,22 @@ class NSIC_Player:
             raise ValueError("Weight must be an integer.")
         self._weight = weight
 
+    @property
+    def total_points(self) -> float:
+        """
+        Returns the player's total points.
+        """
+        return self._total_points
+    
+    @total_points.setter
+    def total_points(self, total_points: float) -> None:
+        """
+        Sets the player's total points.
+        """
+        if not isinstance(total_points, float):
+            raise ValueError("Total points must be a float.")
+        self._total_points = total_points
+
     @classmethod
     def empty_player(cls) -> "NSIC_Player":
         """
@@ -205,7 +223,8 @@ class NSIC_Player:
             "cls": self.cls,
             "jersey_number": self.jersey_number,
             "height": self.height,
-            "weight": self.weight
+            "weight": self.weight,
+            "total_points": self.total_points
         }
     
     def to_dict(self):
@@ -231,7 +250,8 @@ class NSIC_Player:
             cls=json["cls"],
             jersey_number=json["jersey_number"],
             height=json["height"],
-            weight=json["weight"]
+            weight=json["weight"],
+            total_points=json["total_points"]
         )
     
     @classmethod
@@ -248,5 +268,6 @@ class NSIC_Player:
             cls=tuple[5],
             jersey_number=tuple[6],
             height=tuple[7],
-            weight=tuple[8]
+            weight=tuple[8],
+            total_points=float(tuple[9])
         )
