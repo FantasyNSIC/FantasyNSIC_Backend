@@ -13,7 +13,7 @@ class Team_Record:
                  losses: int,
                  points_for: float,
                  points_against: float,
-                 user_team_name: str = None) -> None:
+                 user_team_name: str = "") -> None:
         """
         Initializes a team record object.
         """
@@ -120,11 +120,23 @@ class Team_Record:
             raise ValueError("User team name must be a string.")
         self._user_team_name = user_team_name
 
+    @classmethod
+    def empty_record(cls) -> "Team_Record":
+        """
+        Returns an empty team record.
+        """
+        return cls(
+            user_team_id=0,
+            wins=0,
+            losses=0,
+            points_for=0.0,
+            points_against=0.0)
+
     def to_json(self) -> dict:
         """
         Returns a JSON representation of the team record.
         """
-        if self.user_team_name is not None:
+        if self.user_team_name is not "":
             return {
                 'user_team_id': self.user_team_id,
                 'wins': self.wins,

@@ -25,8 +25,8 @@ def get_available_players():
 @app.route('/db/getMatchupInfo', methods=['GET'])
 def get_matchup_info():
     # Fetch team information from the database.
-    team_id = request.args.get('team_id')
-    return jsonify(team_id)
+    user_team_id = request.args.get('user_team_id')
+    return matchup_information_service(user_team_id).toJson()
 
 @app.route('/db/getScoreboardInfo', methods=['GET'])
 def get_scoreboard_info():
