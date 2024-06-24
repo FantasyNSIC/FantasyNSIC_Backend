@@ -69,3 +69,15 @@ class UserRoster:
             "K": [player.to_json() for player in self.K],
             "BENCH": [player.to_json() for player in self.BENCH]
         }
+    
+    def from_json(self, json_data: dict) -> None:
+        """
+        Initializes the roster from a dictionary.
+        :param json_data: The dictionary to initialize from.
+        """
+        self.QB = [NSIC_Player.from_json(player) for player in json_data["QB"]]
+        self.RB = [NSIC_Player.from_json(player) for player in json_data["RB"]]
+        self.WR = [NSIC_Player.from_json(player) for player in json_data["WR"]]
+        self.TE = [NSIC_Player.from_json(player) for player in json_data["TE"]]
+        self.K = [NSIC_Player.from_json(player) for player in json_data["K"]]
+        self.BENCH = [NSIC_Player.from_json(player) for player in json_data["BENCH"]]

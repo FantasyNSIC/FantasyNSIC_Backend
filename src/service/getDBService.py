@@ -2,12 +2,15 @@
 
 from ..util.connection import connect_to_fantasyDB
 from .classes.User_Roster import UserRoster
+from .classes.Team_Record import Team_Record
 from .classes.responses.MyTeamInfoResponse import MyTeamInfoResponse
 from .classes.responses.AvailablePlayersResponse import AvailablePlayersResponse
+from .classes.responses.MatchupInfoResponse import MatchupInfoResponse
 from .classes.responses.ScoreboardInfoResponse import ScoreboardInfoResponse
 from .classes.responses.LeagueInfoResponse import LeagueInfoResponse
 from .classes.responses.StandingsInfoResponse import StandingsInfoResponse
 from .service_handlers.myTeamRosterHandle import handle_roster_creation
+from .service_handlers.matchupRosterHandle import matchup_roster_creation
 from .service_handlers.scoreboardMatchupHandle import format_weekly_matchups
 
 def my_team_information_service(user_team_id):
@@ -79,6 +82,67 @@ def available_players_service(league_id):
         conn.close()
     available_players = AvailablePlayersResponse.from_tuple(fetched_players)
     return available_players
+
+def matchup_information_service(user_team_id):
+    """
+    Fetches matchup information from the database.
+    :param user_team_id: The ID of the user's team.
+    """
+    # Initialize empty response object.
+    matchup_info = MatchupInfoResponse('', '', '', Team_Record.empty_record(), 0.0, UserRoster(), '', '',
+                                       Team_Record.empty_record(), 0.0, UserRoster())
+    team_1_info = None
+    team_2_info = None
+    formatted_roster_1 = UserRoster()
+    formatted_roster_2 = UserRoster()
+    conn = connect_to_fantasyDB()
+    cur = conn.cursor()
+
+    # Execute queries to get matchup information.
+    try:
+        # Get current week.
+        with open('src/queries/get_matchup_current_week.sql', 'r') as sql:
+            query = sql.read()
+        cur.execute(query, (user_team_id,))
+        current_week_res = cur.fetchone()
+        current_week = current_week_res[0]
+        league_constraint = current_week_res[1]
+
+        # Get both user's general info.
+        with open('src/queries/get_matchup_users_info.sql', 'r') as sql:
+            query_temp = sql.read()
+        query = query_temp.format(current_week=current_week)
+        cur.execute(query, (user_team_id, user_team_id))
+        res_user_info = cur.fetchall()
+        if res_user_info[0][2] == user_team_id:
+            team_1_info = res_user_info[0]
+            team_2_info = res_user_info[1]
+        else:
+            team_1_info = res_user_info[1]
+            team_2_info = res_user_info[0]
+
+        # Get both user's rosters.
+        with open('src/queries/get_matchup_users_rosters.sql', 'r') as sql:
+            query_temp = sql.read()
+        query = query_temp.format(current_week=current_week)
+        cur.execute(query, (team_1_info[2], team_2_info[2]))
+        res_rosters = cur.fetchall()
+        formatted_roster_1 = matchup_roster_creation(res_rosters, team_1_info[2], league_constraint)
+        formatted_roster_2 = matchup_roster_creation(res_rosters, team_2_info[2], league_constraint)
+
+    except Exception as e:
+        print(e)
+    finally:
+        cur.close()
+        conn.close()
+    if team_1_info and team_2_info is not None:
+        matchup_info = MatchupInfoResponse(
+            current_week, team_1_info[0], team_1_info[1], Team_Record.from_tuple(team_1_info[2:7]),
+            float(team_1_info[7]), formatted_roster_1, team_2_info[0], team_2_info[1],
+            Team_Record.from_tuple(team_2_info[2:7]), float(team_2_info[7]), formatted_roster_2
+        )
+        return matchup_info
+    return matchup_info
 
 def scorboard_information_service(league_id):
     """
