@@ -218,13 +218,13 @@ class MatchupInfoResponse:
             'current_week': self.current_week,
             'team_1_name': self.team_1_name,
             'team_1_full_name': self.team_1_full_name,
-            'team_1_points': self.team_1_points,
             'team_1_record': self.team_1_record.to_json(),
+            'team_1_points': self.team_1_points,
             'team_1_roster': self.team_1_roster.to_json(),
             'team_2_name': self.team_2_name,
             'team_2_full_name': self.team_2_full_name,
-            'team_2_points': self.team_2_points,
             'team_2_record': self.team_2_record.to_json(),
+            'team_2_points': self.team_2_points,
             'team_2_roster': self.team_2_roster.to_json()
         }
     
@@ -237,12 +237,12 @@ class MatchupInfoResponse:
             json['current_week'],
             json['team_1_name'],
             json['team_1_full_name'],
-            json['team_1_points'],
             Team_Record.from_json(json['team_1_record']),
+            json['team_1_points'],
             UserRoster.from_json(json['team_1_roster']),
             json['team_2_name'],
             json['team_2_full_name'],
-            json['team_2_points'],
             Team_Record.from_json(json['team_2_record']),
+            json['team_2_points'],
             UserRoster.from_json(json['team_2_roster'])
         )
