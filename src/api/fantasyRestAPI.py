@@ -47,7 +47,7 @@ def get_standings_info():
     league_id = request.args.get('league_id')
     return standings_information_service(league_id).toJson()
 
-@app.route('/db/getPlayerInfo', methods=['POST'])
+@app.route('/db/getNSICPlayerInfo', methods=['POST'])
 def get_nsic_player_info():
     # Fetch player information from the database.
     player_id = request.json['player_id']
