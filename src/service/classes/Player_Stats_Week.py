@@ -1,15 +1,14 @@
 """
-This class contains the representation of a NSIC player's statistics for the 2023 season.
+This class contains the representation of a NSIC player's statistics for a given week.
 """
 
 
-class Player_Stats_2023:
+class Player_Stats_Week:
     """
-    Represents a player's statistics for the 2023 season.
+    Represents a player's statistics for a given week.
     """
     def __init__(self,
                  player_id: int,
-                 gp: int,
                  rush_att: int,
                  rush_yds: int,
                  rush_avg: float,
@@ -24,12 +23,12 @@ class Player_Stats_2023:
                  recieve_avg: float,
                  recieve_td: int,
                  fg_att: int,
-                 fg_made: int) -> None:
+                 fg_made: int,
+                 week_points: float = 0.0) -> None:
         """
         Initializes a player's statistics object.
         """
         self.player_id = player_id
-        self.gp = gp
         self.rush_att = rush_att
         self.rush_yds = rush_yds
         self.rush_avg = rush_avg
@@ -45,6 +44,7 @@ class Player_Stats_2023:
         self.recieve_td = recieve_td
         self.fg_att = fg_att
         self.fg_made = fg_made
+        self.week_points = week_points
 
     @property
     def player_id(self) -> int:
@@ -54,29 +54,11 @@ class Player_Stats_2023:
         return self._player_id
     
     @player_id.setter
-    def player_id(self, player_id: int) -> None:
+    def player_id(self, value: int) -> None:
         """
         Sets the player's id.
         """
-        if not isinstance(player_id, int):
-            raise ValueError("Player ID must be an integer.")
-        self._player_id = player_id
-    
-    @property
-    def gp(self) -> int:
-        """
-        Returns the number of games played.
-        """
-        return self._gp
-    
-    @gp.setter
-    def gp(self, gp: int) -> None:
-        """
-        Sets the number of games played.
-        """
-        if not isinstance(gp, int):
-            raise ValueError("Games played must be an integer.")
-        self._gp = gp
+        self._player_id = value
     
     @property
     def rush_att(self) -> int:
@@ -86,13 +68,11 @@ class Player_Stats_2023:
         return self._rush_att
     
     @rush_att.setter
-    def rush_att(self, rush_att: int) -> None:
+    def rush_att(self, value: int) -> None:
         """
         Sets the number of rushing attempts.
         """
-        if not isinstance(rush_att, int):
-            raise ValueError("Rushing attempts must be an integer.")
-        self._rush_att = rush_att
+        self._rush_att = value
     
     @property
     def rush_yds(self) -> int:
@@ -102,13 +82,11 @@ class Player_Stats_2023:
         return self._rush_yds
     
     @rush_yds.setter
-    def rush_yds(self, rush_yds: int) -> None:
+    def rush_yds(self, value: int) -> None:
         """
         Sets the number of rushing yards.
         """
-        if not isinstance(rush_yds, int):
-            raise ValueError("rush_yds must be an integer")
-        self._rush_yds = rush_yds
+        self._rush_yds = value
     
     @property
     def rush_avg(self) -> float:
@@ -118,13 +96,11 @@ class Player_Stats_2023:
         return self._rush_avg
     
     @rush_avg.setter
-    def rush_avg(self, rush_avg: float) -> None:
+    def rush_avg(self, value: float) -> None:
         """
         Sets the average rushing yards per attempt.
         """
-        if not isinstance(rush_avg, float):
-            raise ValueError("rush_avg must be a float")
-        self._rush_avg = rush_avg
+        self._rush_avg = value
     
     @property
     def rush_td(self) -> int:
@@ -134,13 +110,11 @@ class Player_Stats_2023:
         return self._rush_td
     
     @rush_td.setter
-    def rush_td(self, rush_td: int) -> None:
+    def rush_td(self, value: int) -> None:
         """
         Sets the number of rushing touchdowns.
         """
-        if not isinstance(rush_td, int):
-            raise ValueError("rush_td must be an integer")
-        self._rush_td = rush_td
+        self._rush_td = value
     
     @property
     def pass_comp(self) -> int:
@@ -150,13 +124,11 @@ class Player_Stats_2023:
         return self._pass_comp
     
     @pass_comp.setter
-    def pass_comp(self, pass_comp: int) -> None:
+    def pass_comp(self, value: int) -> None:
         """
         Sets the number of passing completions.
         """
-        if not isinstance(pass_comp, int):
-            raise ValueError("pass_comp must be an integer")
-        self._pass_comp = pass_comp
+        self._pass_comp = value
     
     @property
     def pass_att(self) -> int:
@@ -166,13 +138,11 @@ class Player_Stats_2023:
         return self._pass_att
     
     @pass_att.setter
-    def pass_att(self, pass_att: int) -> None:
+    def pass_att(self, value: int) -> None:
         """
         Sets the number of passing attempts.
         """
-        if not isinstance(pass_att, int):
-            raise ValueError("pass_att must be an integer")
-        self._pass_att = pass_att
+        self._pass_att = value
     
     @property
     def pass_yds(self) -> int:
@@ -182,13 +152,11 @@ class Player_Stats_2023:
         return self._pass_yds
     
     @pass_yds.setter
-    def pass_yds(self, pass_yds: int) -> None:
+    def pass_yds(self, value: int) -> None:
         """
         Sets the number of passing yards.
         """
-        if not isinstance(pass_yds, int):
-            raise ValueError("pass_yds must be an integer")
-        self._pass_yds = pass_yds
+        self._pass_yds = value
     
     @property
     def pass_td(self) -> int:
@@ -198,13 +166,11 @@ class Player_Stats_2023:
         return self._pass_td
     
     @pass_td.setter
-    def pass_td(self, pass_td: int) -> None:
+    def pass_td(self, value: int) -> None:
         """
         Sets the number of passing touchdowns.
         """
-        if not isinstance(pass_td, int):
-            raise ValueError("pass_td must be an integer")
-        self._pass_td = pass_td
+        self._pass_td = value
     
     @property
     def pass_int(self) -> int:
@@ -214,13 +180,11 @@ class Player_Stats_2023:
         return self._pass_int
     
     @pass_int.setter
-    def pass_int(self, pass_int: int) -> None:
+    def pass_int(self, value: int) -> None:
         """
         Sets the number of passing interceptions.
         """
-        if not isinstance(pass_int, int):
-            raise ValueError("pass_int must be an integer")
-        self._pass_int = pass_int
+        self._pass_int = value
     
     @property
     def recieve_rec(self) -> int:
@@ -230,13 +194,11 @@ class Player_Stats_2023:
         return self._recieve_rec
     
     @recieve_rec.setter
-    def recieve_rec(self, recieve_rec: int) -> None:
+    def recieve_rec(self, value: int) -> None:
         """
         Sets the number of receptions.
         """
-        if not isinstance(recieve_rec, int):
-            raise ValueError("recieve_rec must be an integer")
-        self._recieve_rec = recieve_rec
+        self._recieve_rec = value
     
     @property
     def recieve_yds(self) -> int:
@@ -246,13 +208,11 @@ class Player_Stats_2023:
         return self._recieve_yds
     
     @recieve_yds.setter
-    def recieve_yds(self, recieve_yds: int) -> None:
+    def recieve_yds(self, value: int) -> None:
         """
         Sets the number of receiving yards.
         """
-        if not isinstance(recieve_yds, int):
-            raise ValueError("recieve_yds must be an integer")
-        self._recieve_yds = recieve_yds
+        self._recieve_yds = value
     
     @property
     def recieve_avg(self) -> float:
@@ -262,13 +222,11 @@ class Player_Stats_2023:
         return self._recieve_avg
     
     @recieve_avg.setter
-    def recieve_avg(self, recieve_avg: float) -> None:
+    def recieve_avg(self, value: float) -> None:
         """
         Sets the average receiving yards per reception.
         """
-        if not isinstance(recieve_avg, float):
-            raise ValueError("recieve_avg must be a float")
-        self._recieve_avg = recieve_avg
+        self._recieve_avg = value
     
     @property
     def recieve_td(self) -> int:
@@ -278,13 +236,11 @@ class Player_Stats_2023:
         return self._recieve_td
     
     @recieve_td.setter
-    def recieve_td(self, recieve_td: int) -> None:
+    def recieve_td(self, value: int) -> None:
         """
         Sets the number of receiving touchdowns.
         """
-        if not isinstance(recieve_td, int):
-            raise ValueError("recieve_td must be an integer")
-        self._recieve_td = recieve_td
+        self._recieve_td = value
     
     @property
     def fg_att(self) -> int:
@@ -294,13 +250,11 @@ class Player_Stats_2023:
         return self._fg_att
     
     @fg_att.setter
-    def fg_att(self, fg_att: int) -> None:
+    def fg_att(self, value: int) -> None:
         """
         Sets the number of field goal attempts.
         """
-        if not isinstance(fg_att, int):
-            raise ValueError("fg_att must be an integer")
-        self._fg_att = fg_att
+        self._fg_att = value
     
     @property
     def fg_made(self) -> int:
@@ -310,38 +264,25 @@ class Player_Stats_2023:
         return self._fg_made
     
     @fg_made.setter
-    def fg_made(self, fg_made: int) -> None:
+    def fg_made(self, value: int) -> None:
         """
         Sets the number of field goals made.
         """
-        if not isinstance(fg_made, int):
-            raise ValueError("fg_made must be an integer")
-        self._fg_made = fg_made
+        self._fg_made = value
     
-    @classmethod
-    def empty_stats(cls, player_id: int) -> "Player_Stats_2023":
+    @property
+    def week_points(self) -> float:
         """
-        Returns an empty player statistics object.
+        Returns the number of points scored in the week.
         """
-        return cls(
-            player_id=player_id,
-            gp=0,
-            rush_att=0,
-            rush_yds=0,
-            rush_avg=0.0,
-            rush_td=0,
-            pass_comp=0,
-            pass_att=0,
-            pass_yds=0,
-            pass_td=0,
-            pass_int=0,
-            recieve_rec=0,
-            recieve_yds=0,
-            recieve_avg=0.0,
-            recieve_td=0,
-            fg_att=0,
-            fg_made=0
-        )
+        return self._week_points
+    
+    @week_points.setter
+    def week_points(self, value: float) -> None:
+        """
+        Sets the number of points scored in the week.
+        """
+        self._week_points = value
     
     def filter_stats(self, pos: str) -> dict:
         """
@@ -349,7 +290,7 @@ class Player_Stats_2023:
         """
         if pos == "RB":
             return {
-                "gp": self.gp,
+                "week_points": self.week_points,
                 "rush_att": self.rush_att,
                 "rush_yds": self.rush_yds,
                 "rush_avg": self.rush_avg,
@@ -361,7 +302,7 @@ class Player_Stats_2023:
             }
         elif pos == "QB":
             return {
-                "gp": self.gp,
+                "week_points": self.week_points,
                 "pass_comp": self.pass_comp,
                 "pass_att": self.pass_att,
                 "pass_yds": self.pass_yds,
@@ -374,7 +315,7 @@ class Player_Stats_2023:
             }
         elif pos == "WR":
             return {
-                "gp": self.gp,
+                "week_points": self.week_points,
                 "recieve_rec": self.recieve_rec,
                 "recieve_yds": self.recieve_yds,
                 "recieve_avg": self.recieve_avg,
@@ -386,7 +327,7 @@ class Player_Stats_2023:
             }
         elif pos == "TE":
             return {
-                "gp": self.gp,
+                "week_points": self.week_points,
                 "recieve_rec": self.recieve_rec,
                 "recieve_yds": self.recieve_yds,
                 "recieve_avg": self.recieve_avg,
@@ -398,13 +339,13 @@ class Player_Stats_2023:
             }
         elif pos == "K":
             return {
-                "gp": self.gp,
+                "week_points": self.week_points,
                 "fg_att": self.fg_att,
                 "fg_made": self.fg_made
             }
         else:
             return {
-                "gp": self.gp
+                "week_points": self.week_points,
             }
     
     def to_json(self) -> dict:
@@ -413,7 +354,6 @@ class Player_Stats_2023:
         """
         return {
             "player_id": self.player_id,
-            "gp": self.gp,
             "rush_att": self.rush_att,
             "rush_yds": self.rush_yds,
             "rush_avg": self.rush_avg,
@@ -428,17 +368,17 @@ class Player_Stats_2023:
             "recieve_avg": self.recieve_avg,
             "recieve_td": self.recieve_td,
             "fg_att": self.fg_att,
-            "fg_made": self.fg_made
+            "fg_made": self.fg_made,
+            "week_points": self.week_points
         }
     
     @classmethod
-    def from_json(cls, json: dict) -> "Player_Stats_2023":
+    def from_json(cls, json: dict) -> "Player_Stats_Week":
         """
         Returns a player statistics object from a JSON dictionary.
         """
         return cls(
             player_id=json["player_id"],
-            gp=json["gp"],
             rush_att=json["rush_att"],
             rush_yds=json["rush_yds"],
             rush_avg=json["rush_avg"],
@@ -453,30 +393,31 @@ class Player_Stats_2023:
             recieve_avg=json["recieve_avg"],
             recieve_td=json["recieve_td"],
             fg_att=json["fg_att"],
-            fg_made=json["fg_made"]
+            fg_made=json["fg_made"],
+            week_points=json["week_points"]
         )
     
     @classmethod
-    def from_tuple(cls, tup: tuple) -> "Player_Stats_2023":
+    def from_tuple(cls, tuple: tuple) -> "Player_Stats_Week":
         """
         Returns a player statistics object from a tuple.
         """
         return cls(
-            player_id=tup[0],
-            gp=tup[1],
-            rush_att=tup[2],
-            rush_yds=tup[3],
-            rush_avg=float(tup[4]),
-            rush_td=tup[5],
-            pass_comp=tup[6],
-            pass_att=tup[7],
-            pass_yds=tup[8],
-            pass_td=tup[9],
-            pass_int=tup[10],
-            recieve_rec=tup[11],
-            recieve_yds=tup[12],
-            recieve_avg=float(tup[13]),
-            recieve_td=tup[14],
-            fg_att=tup[15],
-            fg_made=tup[16]
+            player_id=tuple[0],
+            rush_att=tuple[1],
+            rush_yds=tuple[2],
+            rush_avg=float(tuple[3]),
+            rush_td=tuple[4],
+            pass_comp=tuple[5],
+            pass_att=tuple[6],
+            pass_yds=tuple[7],
+            pass_td=tuple[8],
+            pass_int=tuple[9],
+            recieve_rec=tuple[10],
+            recieve_yds=tuple[11],
+            recieve_avg=float(tuple[12]),
+            recieve_td=tuple[13],
+            fg_att=tuple[14],
+            fg_made=tuple[15],
+            week_points=float(tuple[16])
         )
