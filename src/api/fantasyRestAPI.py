@@ -5,6 +5,7 @@ from flask import Flask, request, jsonify
 from flask_cors import CORS
 from ..util.logger import Logger
 from ..service.getDBService import *
+from ..service.postDBService import *
 
 app = Flask(__name__)
 CORS(app)
@@ -46,11 +47,11 @@ def get_standings_info():
     league_id = request.args.get('league_id')
     return standings_information_service(league_id).toJson()
 
-@app.route('/db/getPlayerInfo', methods=['POST'])
-def get_player_info():
+@app.route('/db/getNSICPlayerInfo', methods=['POST'])
+def get_nsic_player_info():
     # Fetch player information from the database.
     player_id = request.json['player_id']
-    return jsonify(player_id)
+    return get_nsic_player_service(player_id).toJson()
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5001, debug=True)

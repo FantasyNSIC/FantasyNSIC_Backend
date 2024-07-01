@@ -66,6 +66,17 @@ class NSIC_Team:
             raise ValueError("Team abbreviation must be a string.")
         self._abr = abr
 
+    @classmethod
+    def empty_team(cls) -> 'NSIC_Team':
+        """
+        Returns an empty team object.
+        """
+        return cls(
+            team_id=0,
+            team_name='',
+            abr=''
+        )
+
     def to_json(self) -> dict:
         """
         Converts the team object to a JSON object.
@@ -85,4 +96,15 @@ class NSIC_Team:
             team_id=json['team_id'],
             team_name=json['team_name'],
             abr=json['abr']
+        )
+    
+    @classmethod
+    def from_tuple(cls, tup: tuple) -> 'NSIC_Team':
+        """
+        Converts a tuple to a team object.
+        """
+        return cls(
+            team_id=tup[0],
+            team_name=tup[1],
+            abr=tup[2]
         )
