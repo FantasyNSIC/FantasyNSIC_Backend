@@ -6,6 +6,8 @@ from .classes.NSIC_Team import NSIC_Team
 from .classes.Player_Stats_2023 import Player_Stats_2023
 from .classes.Player_Stats_Week import Player_Stats_Week
 from .classes.responses.NSICPlayerResponse import NSICPlayerResponse
+from .classes.responses.ConfirmationResponse import ConfirmationResponse
+from ..service.service_handlers.addPlayerToRosterHandle import handle_new_player_to_roster_determination
 
 def get_nsic_player_service(player_id):
     """
@@ -61,3 +63,71 @@ def get_nsic_player_service(player_id):
                                               weekly_stats)
         return nsic_player_info
     return nsic_player_info
+
+def add_nsic_player_to_roster_service(player_id, user_team_id, league_id):
+    """
+    Adds a NSIC player to a user's roster.
+    :param player_id: The ID of the player.
+    :param user_team_id: The ID of the user's team.
+    :param league_id: The ID of the league.
+    """
+    # Initialize empty response object and connection.
+    conn = connect_to_fantasyDB()
+    cur = conn.cursor()
+    response = ConfirmationResponse(False, "Failed to add player to roster.")
+
+    # Execute queries to determine if player can be added to roster.
+    # if they can, add them to the roster. Otherwise, return a failure response.
+    try:
+        # CASE 1: Does NSIC player_id exist?
+        with open('src/queries/check_nsic_player_exists.sql', 'r') as sql:
+            query = sql.read()
+        cur.execute(query, (player_id,))
+        player_res = cur.fetchone()
+        if player_res is None:
+            response.message = "Failed to add player to roster. NSIC Player does not exist."
+            return response
+        player_pos = player_res[4]
+        
+        # CASE 2: Is the NSIC player already taken?
+        with open('src/queries/check_if_nsic_player_is_taken.sql', 'r') as sql:
+            query = sql.read()
+        cur.execute(query, (league_id, player_id))
+        if cur.fetchone() is not None:
+            response.message = "Failed to add player to roster. NSIC Player is already taken."
+            return response
+        
+        # CASE 3: Is the user's roster full?
+        # Fetch league constraints.
+        with open('src/queries/get_league_information.sql', 'r') as sql:
+            query = sql.read()
+        cur.execute(query, (league_id,))
+        league_info_res = cur.fetchone()
+        constraints = league_info_res[1]
+        # Check if roster is full.
+        with open('src/queries/get_my_team_roster_players.sql', 'r') as sql:
+            query = sql.read()
+        cur.execute(query, (user_team_id,))
+        res_roster = cur.fetchall()
+        roster_spot = handle_new_player_to_roster_determination(res_roster, constraints, player_pos)
+        if not roster_spot[0]:
+            response.message = "Failed to add player to roster. Your roster is full, Please drop a player first."
+            return response
+        
+        # If all cases pass, add player to roster.
+        with open('src/queries/insert_into_taken_players.sql', 'r') as sql:
+            query = sql.read()
+        cur.execute(query, (league_id, user_team_id, player_id))
+        with open('src/queries/insert_into_team_roster.sql', 'r') as sql:
+            query = sql.read()
+        cur.execute(query, (user_team_id, player_id, roster_spot[1], player_pos))
+        conn.commit()
+        response.success = True
+        response.message = "Player added to roster successfully."
+        
+    except Exception as e:
+        print(e)
+    finally:
+        cur.close()
+        conn.close()
+    return response

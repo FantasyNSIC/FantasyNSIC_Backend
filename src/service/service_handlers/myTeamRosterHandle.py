@@ -3,7 +3,7 @@ from ..classes.User_Roster import UserRoster
 from ..classes.NSIC_Player import NSIC_Player
 from ..classes.LeagueConstraint import LeagueConstraint
 
-def handle_roster_creation(res_roster: list, constaints: str):
+def handle_roster_creation(res_roster: list, constraints: str):
     """
     Handles creating a new UserRoster for the myTeamInfo service based on league constraints.
     :param res_roster: The roster information from the database.
@@ -11,7 +11,7 @@ def handle_roster_creation(res_roster: list, constaints: str):
     :return: A new UserRoster object.
     """
     new_roster = UserRoster()
-    new_constraints = LeagueConstraint.from_constraints_response(constaints)
+    new_constraints = LeagueConstraint.from_constraints_response(constraints)
     overflowFlag = ""
     for player in res_roster:
         new_player = NSIC_Player.from_tuple(player[1:])
