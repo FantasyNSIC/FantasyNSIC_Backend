@@ -131,3 +131,52 @@ def add_nsic_player_to_roster_service(player_id, user_team_id, league_id):
         cur.close()
         conn.close()
     return response
+
+def drop_nsic_player_from_roster_service(player_id, user_team_id, league_id):
+    """
+    Drops a NSIC player from a user's roster.
+    :param player_id: The ID of the player.
+    :param user_team_id: The ID of the user's team.
+    :param league_id: The ID of the league.
+    """
+    # Initialize empty response object and connection.
+    conn = connect_to_fantasyDB()
+    cur = conn.cursor()
+    response = ConfirmationResponse(False, "Failed to drop player from roster.")
+
+    # Execute queries to determine if player can be dropped from roster.
+    # if they can, drop them from the roster. Otherwise, return a failure response.
+    try:
+        # CASE 1: Does NSIC player_id exist?
+        with open('src/queries/check_nsic_player_exists.sql', 'r') as sql:
+            query = sql.read()
+        cur.execute(query, (player_id,))
+        if cur.fetchone() is None:
+            response.message = "Failed to drop player from roster. NSIC Player does not exist."
+            return response
+
+        # CASE 2: Is the NSIC player on the user's roster?
+        with open('src/queries/check_nsic_player_on_roster.sql', 'r') as sql:
+            query = sql.read()
+        cur.execute(query, (user_team_id, player_id))
+        if cur.fetchone() is None:
+            response.message = "Failed to drop player from roster. NSIC Player is not on your roster."
+            return response
+        
+        # If all cases pass, drop player from roster.
+        with open('src/queries/delete_from_taken_players.sql', 'r') as sql:
+            query = sql.read()
+        cur.execute(query, (league_id, user_team_id, player_id))
+        with open('src/queries/delete_from_team_roster.sql', 'r') as sql:
+            query = sql.read()
+        cur.execute(query, (user_team_id, player_id))
+        conn.commit()
+        response.success = True
+        response.message = "Player dropped from roster successfully."
+        
+    except Exception as e:
+        print(e)
+    finally:
+        cur.close()
+        conn.close()
+    return response
