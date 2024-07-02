@@ -158,7 +158,7 @@ def drop_nsic_player_from_roster_service(player_id, user_team_id, league_id):
         # CASE 2: Is the NSIC player on the user's roster?
         with open('src/queries/check_nsic_player_on_roster.sql', 'r') as sql:
             query = sql.read()
-        cur.execute(query, (user_team_id, player_id))
+        cur.execute(query, (user_team_id, player_id, league_id))
         if cur.fetchone() is None:
             response.message = "Failed to drop player from roster. NSIC Player is not on your roster."
             return response
