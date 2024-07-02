@@ -176,6 +176,8 @@ def drop_nsic_player_from_roster_service(player_id, user_team_id, league_id):
         
     except Exception as e:
         print(e)
+        response.message = str(e)
+        return response
     finally:
         cur.close()
         conn.close()
