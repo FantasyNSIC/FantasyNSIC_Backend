@@ -69,5 +69,14 @@ def drop_nsic_player_from_roster():
     league_id = request.json['league_id']
     return drop_nsic_player_from_roster_service(player_id, user_team_id, league_id).toJson()
 
+@app.route('/rq/moveNSICPlayersOnRoster', methods=['POST'])
+def move_nsic_players_on_roster():
+    # Move NSIC players on a user's roster.
+    user_team_id = request.json['user_team_id']
+    league_id = request.json['league_id']
+    player_id_1 = request.json['player_id_1']
+    player_id_2 = request.json['player_id_2']
+    return move_nsic_players_on_roster_service(user_team_id, league_id, player_id_1, player_id_2).toJson()
+
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5001, debug=True)
