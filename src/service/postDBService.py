@@ -147,15 +147,7 @@ def drop_nsic_player_from_roster_service(player_id, user_team_id, league_id):
     # Execute queries to determine if player can be dropped from roster.
     # if they can, drop them from the roster. Otherwise, return a failure response.
     try:
-        # CASE 1: Does NSIC player_id exist?
-        with open('src/queries/check_nsic_player_exists.sql', 'r') as sql:
-            query = sql.read()
-        cur.execute(query, (player_id,))
-        if cur.fetchone() is None:
-            response.message = "Failed to drop player from roster. NSIC Player does not exist."
-            return response
-
-        # CASE 2: Is the NSIC player on the user's roster?
+        # CASE 1: Is the NSIC player on the user's roster?
         with open('src/queries/check_nsic_player_on_roster.sql', 'r') as sql:
             query = sql.read()
         cur.execute(query, (user_team_id, player_id, league_id))
@@ -178,6 +170,76 @@ def drop_nsic_player_from_roster_service(player_id, user_team_id, league_id):
         print(e)
         response.message = str(e)
         return response
+    finally:
+        cur.close()
+        conn.close()
+    return response
+
+def move_nsic_players_on_roster_service(user_team_id, league_id, player_id_1, player_id_2):
+    """
+    Moves NSIC players on a user's roster.
+    :param user_team_id: The ID of the user's team.
+    :param player_1: The ID of the first player.
+    :param player_2: The ID of the second player, can be Null.
+    """
+    # Initialize empty response object and connection.
+    conn = connect_to_fantasyDB()
+    cur = conn.cursor()
+    response = ConfirmationResponse(False, "Failed to move players on roster.")
+
+    # Execute queries to determine if players can be moved on roster.
+    # if they can, move them on the roster. Otherwise, return a failure response.
+    try:
+        # CASE 1: Are the NSIC players on the user's roster?
+        # Player 1
+        if player_id_1 is None:
+            response.message = "Failed to move players on roster. NSIC Player 1 cannot be null."
+            return response
+        if player_id_1 == player_id_2:
+            response.message = "Failed to move players on roster. NSIC Player 1 and 2 cannot be the same."
+            return response
+        with open('src/queries/check_nsic_player_on_roster.sql', 'r') as sql:
+            query = sql.read()
+        cur.execute(query, (user_team_id, player_id_1, league_id))
+        player_1_res = cur.fetchone()
+        if player_1_res is None:
+            response.message = "Failed to move players on roster. NSIC Player 1 is not on your roster."
+            return response
+        player_1_status = player_1_res[2]
+        player_2_status = None
+        # Player 2
+        if player_id_2 is not None:
+            cur.execute(query, (user_team_id, player_id_2, league_id))
+            player_2_res = cur.fetchone()
+            if player_2_res is None:
+                response.message = "Failed to move players on roster. NSIC Player 2 is not on your roster."
+                return response
+            player_2_status = player_2_res[2]
+        
+        # If all cases pass, move players on roster. If player 2's status exists, swap them.
+        # If player 2's status is None, move player 1 to the opposite status.
+        if player_2_status is not None:
+            with open('src/queries/move_NSIC_player_swap_status.sql', 'r') as sql:
+                query = sql.read()
+            cur.execute(query, (player_2_status, player_id_1, user_team_id,
+                                player_1_status, player_id_2, user_team_id))
+        elif player_2_status is None and player_1_status == 'active':
+            with open('src/queries/move_NSIC_player_to_bench.sql', 'r') as sql:
+                query = sql.read()
+            cur.execute(query, (player_id_1, user_team_id))
+        elif player_2_status is None and player_1_status == 'bench':
+            with open('src/queries/move_NSIC_player_to_active.sql', 'r') as sql:
+                query = sql.read()
+            cur.execute(query, (player_id_1, user_team_id))
+        else:
+            response.message = "Failed to move players on roster. Invalid move."
+            return response
+        conn.commit()
+        response.success = True
+        response.message = "Players moved on roster successfully."
+        
+    except Exception as e:
+        print(e)
     finally:
         cur.close()
         conn.close()
