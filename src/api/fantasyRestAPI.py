@@ -1,15 +1,51 @@
 """ File containing the REST API for the fantasy football application """
 
-import time
-from flask import Flask, request, jsonify
+from datetime import timedelta
+from flask import Flask, request, session
 from flask_cors import CORS
+from flask_session import Session
 from ..util.logger import Logger
+from ..service.authService import *
 from ..service.getDBService import *
 from ..service.postDBService import *
 
 app = Flask(__name__)
 CORS(app)
 logger = Logger()
+
+app.config["SESSION_PERMANENT"] = True
+app.config["PERMANENT_SESSION_LIFETIME"] = timedelta(hours=2)
+app.config["SESSION_TYPE"] = "filesystem"
+app.config["SESSION_COOKIE_NAME"] = "nsic_fantasy_session"
+app.config["SESSION_COOKIE_SAMESITE"] = 'Lax'
+app.config["SESSION_COOKIE_HTTPONLY"] = True
+Session(app)
+
+@app.route('/auth/login', methods=['POST'])
+def login():
+    # Login a user.
+    username = request.json['username']
+    password = request.json['password']
+    authenticated = authenticate_user(username, password)
+    if authenticated[0]:
+        session['username'] = username
+        session['user_id'] = authenticated[1]
+        return {'status': 'success', 'message': 'Logged in successfully.'}
+    else:
+        return {'status': 'fail', 'message': 'Invalid credentials.'}
+
+@app.route('/auth/logout', methods=['POST'])
+def logout():
+    # Logout a user.
+    session.clear()
+    return {'message': 'User succesfully logged out.'}
+
+@app.route('/auth/verify_user', methods=['GET'])
+def verify_user():
+    # Verify a user.
+    if not session.get('username') or not session.get('user_id'):
+        return {'status': False, 'message': 'User is not logged in.'}
+    return {'status': True, 'message': 'User is logged in.'}
 
 @app.route('/db/getMyTeamInfo', methods=['GET'])
 def get_team_roster():
