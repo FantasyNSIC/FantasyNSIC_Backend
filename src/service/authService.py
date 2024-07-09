@@ -18,11 +18,16 @@ def authenticate_user(username, password):
         cur.execute(query, (username,))
         res = cur.fetchone()
         if res is not None:
-            return check_password_hash(res[0], password), res[1]
+            with open('src/queries/auth_get_user_teams.sql', 'r') as sql:
+                query = sql.read()
+            cur.execute(query, (res[1],))
+            res_teams = cur.fetchall()
+            teams = [{'user_team_id': team[0], 'league_id': team[1]} for team in res_teams]
+            return check_password_hash(res[0], password), res[1], teams
     except Exception as e:
         print(e)
-        return False, None
+        return False, None, []
     finally:
         cur.close()
         conn.close()
-    return False, None
+    return False, None, []

@@ -10,7 +10,7 @@ from ..service.getDBService import *
 from ..service.postDBService import *
 
 app = Flask(__name__)
-CORS(app)
+CORS(app, supports_credentials=True, origins=['http://localhost:8080'])
 logger = Logger()
 
 app.config["SESSION_PERMANENT"] = True
@@ -19,6 +19,7 @@ app.config["SESSION_TYPE"] = "filesystem"
 app.config["SESSION_COOKIE_NAME"] = "nsic_fantasy_session"
 app.config["SESSION_COOKIE_SAMESITE"] = 'Lax'
 app.config["SESSION_COOKIE_HTTPONLY"] = True
+app.config["SESSION_COOKIE_SECURE"] = False
 Session(app)
 
 @app.route('/auth/login', methods=['POST'])
@@ -28,11 +29,16 @@ def login():
     password = request.json['password']
     authenticated = authenticate_user(username, password)
     if authenticated[0]:
+        session.clear()
         session['username'] = username
         session['user_id'] = authenticated[1]
-        return {'status': 'success', 'message': 'Logged in successfully.'}
+        return {'status': True,
+                'message': 'Logged in successfully.',
+                'user_id': authenticated[1],
+                'user_teams': authenticated[2][1]
+        }
     else:
-        return {'status': 'fail', 'message': 'Invalid credentials.'}
+        return {'status': False, 'message': 'Invalid credentials.'}
 
 @app.route('/auth/logout', methods=['POST'])
 def logout():
@@ -40,7 +46,7 @@ def logout():
     session.clear()
     return {'message': 'User succesfully logged out.'}
 
-@app.route('/auth/verify_user', methods=['GET'])
+@app.route('/auth/verifyUser', methods=['GET'])
 def verify_user():
     # Verify a user.
     if not session.get('username') or not session.get('user_id'):
