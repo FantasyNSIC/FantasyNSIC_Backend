@@ -17,7 +17,7 @@ app.config["SESSION_PERMANENT"] = True
 app.config["PERMANENT_SESSION_LIFETIME"] = timedelta(hours=2)
 app.config["SESSION_TYPE"] = "filesystem"
 app.config["SESSION_COOKIE_NAME"] = "nsic_fantasy_session"
-app.config["SESSION_COOKIE_SAMESITE"] = 'None'
+app.config["SESSION_COOKIE_SAMESITE"] = "None"
 app.config["SESSION_COOKIE_HTTPONLY"] = True
 app.config["SESSION_COOKIE_SECURE"] = True
 Session(app)
@@ -32,6 +32,7 @@ def login():
         session.clear()
         session['username'] = username
         session['user_id'] = authenticated[1]
+        session['user_teams'] = authenticated[2]
         return {'status': True,
                 'message': 'Logged in successfully.',
                 'user_id': authenticated[1],
@@ -49,9 +50,9 @@ def logout():
 @app.route('/auth/verifyUser', methods=['GET'])
 def verify_user():
     # Verify a user.
-    if not session.get('username') or not session.get('user_id'):
+    if not session.get('username') or not session.get('user_id') or not session.get('user_teams'):
         return {'status': False, 'message': 'User is not logged in.'}
-    return {'status': True, 'message': 'User is logged in.'}
+    return {'status': True, 'message': 'User is logged in.', 'user_teams': session.get('user_teams')}
 
 @app.route('/db/getMyTeamInfo', methods=['GET'])
 def get_team_roster():
@@ -121,4 +122,4 @@ def move_nsic_players_on_roster():
     return move_nsic_players_on_roster_service(user_team_id, league_id, player_id_1, player_id_2).toJson()
 
 if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=5001, debug=True, ssl_context=('/path/cert.pem', '/path/key.pem'))
+    app.run(host='0.0.0.0', port=5001, debug=True, ssl_context=('/Users/jacksonthoe/certB.pem', '/Users/jacksonthoe/keyB.pem'))
