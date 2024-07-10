@@ -122,4 +122,4 @@ def move_nsic_players_on_roster():
     return move_nsic_players_on_roster_service(user_team_id, league_id, player_id_1, player_id_2).toJson()
 
 if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=5001, debug=True, ssl_context=('/Users/jacksonthoe/certB.pem', '/Users/jacksonthoe/keyB.pem'))
+    app.run(host='0.0.0.0', port=5001, debug=True, ssl_context=('/certB.pem', '/keyB.pem'))
