@@ -10,16 +10,16 @@ from ..service.getDBService import *
 from ..service.postDBService import *
 
 app = Flask(__name__)
-CORS(app, supports_credentials=True, origins=['http://localhost:8080'])
+CORS(app, supports_credentials=True, origins=['https://localhost:8080'])
 logger = Logger()
 
 app.config["SESSION_PERMANENT"] = True
 app.config["PERMANENT_SESSION_LIFETIME"] = timedelta(hours=2)
 app.config["SESSION_TYPE"] = "filesystem"
 app.config["SESSION_COOKIE_NAME"] = "nsic_fantasy_session"
-app.config["SESSION_COOKIE_SAMESITE"] = 'Lax'
+app.config["SESSION_COOKIE_SAMESITE"] = 'None'
 app.config["SESSION_COOKIE_HTTPONLY"] = True
-app.config["SESSION_COOKIE_SECURE"] = False
+app.config["SESSION_COOKIE_SECURE"] = True
 Session(app)
 
 @app.route('/auth/login', methods=['POST'])
@@ -35,7 +35,7 @@ def login():
         return {'status': True,
                 'message': 'Logged in successfully.',
                 'user_id': authenticated[1],
-                'user_teams': authenticated[2][1]
+                'user_teams': authenticated[2]
         }
     else:
         return {'status': False, 'message': 'Invalid credentials.'}
@@ -121,4 +121,4 @@ def move_nsic_players_on_roster():
     return move_nsic_players_on_roster_service(user_team_id, league_id, player_id_1, player_id_2).toJson()
 
 if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=5001, debug=True)
+    app.run(host='0.0.0.0', port=5001, debug=True, ssl_context=('/path/cert.pem', '/path/key.pem'))

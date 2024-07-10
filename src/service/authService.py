@@ -22,7 +22,8 @@ def authenticate_user(username, password):
                 query = sql.read()
             cur.execute(query, (res[1],))
             res_teams = cur.fetchall()
-            teams = [{'user_team_id': team[0], 'league_id': team[1]} for team in res_teams]
+            teams = [{'user_team_id': team[0], 'team_name': team[1],
+                      'league_id': team[2], 'league_name': team[3]} for team in res_teams]
             return check_password_hash(res[0], password), res[1], teams
     except Exception as e:
         print(e)
