@@ -121,5 +121,23 @@ def move_nsic_players_on_roster():
     player_id_2 = request.json['player_id_2']
     return move_nsic_players_on_roster_service(user_team_id, league_id, player_id_1, player_id_2).toJson()
 
+@app.route('/rq/submitWaiverWireClaim', methods=['POST'])
+def submit_waiver_wire_claim():
+    # Submit a waiver wire claim.
+    user_team_id = request.json['user_team_id']
+    league_id = request.json['league_id']
+    player_add = request.json['player_add']
+    player_remove = request.json['player_remove']
+    return submit_waiver_wire_claim_service(user_team_id, league_id, player_add, player_remove).toJson()
+
+@app.route('/rq/deleteWaiverWireClaim', methods=['POST'])
+def delete_waiver_wire_claim():
+    # Delete a waiver wire claim.
+    user_team_id = request.json['user_team_id']
+    league_id = request.json['league_id']
+    player_add = request.json['player_add']
+    player_remove = request.json['player_remove']
+    return delete_waiver_wire_claim_service(user_team_id, league_id, player_add, player_remove).toJson()
+
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5001, debug=True, ssl_context=('/certB.pem', '/keyB.pem'))
