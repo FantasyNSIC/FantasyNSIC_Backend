@@ -75,7 +75,7 @@ def get_user_team_roster_service(league_id, user_team_id):
     # Initialize empty response objects.
     conn = connect_to_fantasyDB()
     cur = conn.cursor()
-    formatted_roster = UserRoster()
+    formatted_roster = None
 
     # Execute queries to get user team roster information.
     try:
@@ -91,7 +91,7 @@ def get_user_team_roster_service(league_id, user_team_id):
             query = sql.read()
         cur.execute(query, (user_team_id,))
         res_roster = cur.fetchall()
-        formatted_roster = matchup_roster_creation(res_roster, user_team_id, constraints)
+        formatted_roster = matchup_roster_creation(res_roster, int(user_team_id), constraints)
 
     except Exception as e:
         print(e)

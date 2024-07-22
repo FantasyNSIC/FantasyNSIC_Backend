@@ -99,8 +99,8 @@ def get_nsic_player_info():
 @app.route('/db/getUserTeamRoster', methods=['POST'])
 def get_user_team_roster():
     # Fetch user team roster from the database.
-    user_team_id = request.json['user_team_id']
     league_id = request.json['league_id']
+    user_team_id = request.json['user_team_id']
     return get_user_team_roster_service(league_id, user_team_id).to_json()
 
 @app.route('/rq/addNSICPlayerToRoster', methods=['POST'])
@@ -147,4 +147,3 @@ def delete_waiver_wire_claim():
     return delete_waiver_wire_claim_service(user_team_id, league_id, player_add, player_remove).toJson()
 
 if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=5001, debug=True, ssl_context=('/certB.pem', '/keyB.pem'))
