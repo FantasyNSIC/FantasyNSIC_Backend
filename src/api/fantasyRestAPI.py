@@ -96,6 +96,13 @@ def get_nsic_player_info():
     player_id = request.json['player_id']
     return get_nsic_player_service(player_id).toJson()
 
+@app.route('/db/getUserTeamRoster', methods=['POST'])
+def get_user_team_roster():
+    # Fetch user team roster from the database.
+    user_team_id = request.json['user_team_id']
+    league_id = request.json['league_id']
+    return get_user_team_roster_service(league_id, user_team_id).to_json()
+
 @app.route('/rq/addNSICPlayerToRoster', methods=['POST'])
 def add_nsic_player_to_roster():
     # Add a NSIC player to a user's roster.

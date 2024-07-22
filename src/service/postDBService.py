@@ -3,11 +3,13 @@
 from ..util.connection import connect_to_fantasyDB
 from .classes.NSIC_Player import NSIC_Player
 from .classes.NSIC_Team import NSIC_Team
+from .classes.User_Roster import UserRoster
 from .classes.Player_Stats_2023 import Player_Stats_2023
 from .classes.Player_Stats_Week import Player_Stats_Week
 from .classes.responses.NSICPlayerResponse import NSICPlayerResponse
 from .classes.responses.ConfirmationResponse import ConfirmationResponse
 from ..service.service_handlers.addPlayerToRosterHandle import handle_new_player_to_roster_determination
+from ..service.service_handlers.matchupRosterHandle import matchup_roster_creation
 
 def get_nsic_player_service(player_id):
     """
@@ -63,6 +65,40 @@ def get_nsic_player_service(player_id):
                                               weekly_stats)
         return nsic_player_info
     return nsic_player_info
+
+def get_user_team_roster_service(league_id, user_team_id):
+    """
+    Fetches a user's team roster from the database.
+    :param league_id: The ID of the league.
+    :param user_team_id: The ID of the user's team.
+    """
+    # Initialize empty response objects.
+    conn = connect_to_fantasyDB()
+    cur = conn.cursor()
+    formatted_roster = UserRoster()
+
+    # Execute queries to get user team roster information.
+    try:
+        # Get league constraints.
+        with open('src/queries/get_league_information.sql', 'r') as sql:
+            query = sql.read()
+        cur.execute(query, (league_id,))
+        league_info_res = cur.fetchone()
+        constraints = league_info_res[1]
+
+        # Get user team roster.
+        with open('src/queries/get_user_team_roster.sql', 'r') as sql:
+            query = sql.read()
+        cur.execute(query, (user_team_id,))
+        res_roster = cur.fetchall()
+        formatted_roster = matchup_roster_creation(res_roster, user_team_id, constraints)
+
+    except Exception as e:
+        print(e)
+    finally:
+        cur.close()
+        conn.close()
+    return formatted_roster
 
 def add_nsic_player_to_roster_service(player_id, user_team_id, league_id):
     """
