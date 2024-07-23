@@ -9,6 +9,7 @@ from .classes.responses.MatchupInfoResponse import MatchupInfoResponse
 from .classes.responses.ScoreboardInfoResponse import ScoreboardInfoResponse
 from .classes.responses.LeagueInfoResponse import LeagueInfoResponse
 from .classes.responses.StandingsInfoResponse import StandingsInfoResponse
+from .classes.responses.WaiverWiresResponse import WaiverWiresResponse
 from .service_handlers.myTeamRosterHandle import handle_roster_creation
 from .service_handlers.matchupRosterHandle import matchup_roster_creation
 from .service_handlers.scoreboardMatchupHandle import format_weekly_matchups
@@ -244,3 +245,28 @@ def standings_information_service(league_id):
         conn.close()
     standings = StandingsInfoResponse.from_tuple(fetched_standings)
     return standings
+
+def waiver_wire_claims_service(user_team_id, league_id):
+    """
+    Fetches waiver wire claims from the database.
+    :param user_team_id: The ID of the user's team.
+    :param league_id: The ID of the user's league.
+    """
+    # Read SQL query from file, connect to DB.
+    waiver_wire_claims = WaiverWiresResponse([])
+    with open('src/queries/get_waiver_wire_claims.sql', 'r') as sql:
+        query = sql.read()
+    conn = connect_to_fantasyDB()
+    cur = conn.cursor()
+
+    # Execute query to get waiver wire claims.
+    try:
+        cur.execute(query, (user_team_id, league_id))
+        fetched_claims = cur.fetchall()
+    except Exception as e:
+        print(e)
+    finally:
+        cur.close()
+        conn.close()
+    waiver_wire_claims = WaiverWiresResponse.from_tuple(fetched_claims)
+    return waiver_wire_claims

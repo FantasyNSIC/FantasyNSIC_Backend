@@ -259,6 +259,18 @@ class NSIC_Player:
         """
         Returns a player object from a tuple representation.
         """
+        if len(tuple) == 9:
+            return cls(
+                player_id=tuple[0],
+                first_name=tuple[1],
+                last_name=tuple[2],
+                team_id=tuple[3],
+                pos=tuple[4],
+                cls=tuple[5],
+                jersey_number=tuple[6],
+                height=tuple[7],
+                weight=tuple[8]
+            )
         return cls(
             player_id=tuple[0],
             first_name=tuple[1],

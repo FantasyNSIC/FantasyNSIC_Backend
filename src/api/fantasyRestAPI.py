@@ -90,6 +90,13 @@ def get_standings_info():
     league_id = request.args.get('league_id')
     return standings_information_service(league_id).toJson()
 
+@app.route('/db/getWaiverWireClaims', methods=['GET'])
+def get_waiver_wire_claims():
+    # Fetch waiver wire claims from the database.
+    user_team_id = request.args.get('user_team_id')
+    league_id = request.args.get('league_id')
+    return waiver_wire_claims_service(user_team_id, league_id).toJson()
+
 @app.route('/db/getNSICPlayerInfo', methods=['POST'])
 def get_nsic_player_info():
     # Fetch player information from the database.
@@ -147,3 +154,4 @@ def delete_waiver_wire_claim():
     return delete_waiver_wire_claim_service(user_team_id, league_id, player_add, player_remove).toJson()
 
 if __name__ == '__main__':
+    app.run(host='0.0.0.0', port=5001, debug=True, ssl_context=('/certB.pem', '/keyB.pem'))
