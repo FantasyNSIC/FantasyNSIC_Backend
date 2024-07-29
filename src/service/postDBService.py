@@ -3,11 +3,13 @@
 from ..util.connection import connect_to_fantasyDB
 from .classes.NSIC_Player import NSIC_Player
 from .classes.NSIC_Team import NSIC_Team
+from .classes.User_Roster import UserRoster
 from .classes.Player_Stats_2023 import Player_Stats_2023
 from .classes.Player_Stats_Week import Player_Stats_Week
 from .classes.responses.NSICPlayerResponse import NSICPlayerResponse
 from .classes.responses.ConfirmationResponse import ConfirmationResponse
 from ..service.service_handlers.addPlayerToRosterHandle import handle_new_player_to_roster_determination
+from ..service.service_handlers.matchupRosterHandle import matchup_roster_creation
 
 def get_nsic_player_service(player_id):
     """
@@ -63,6 +65,40 @@ def get_nsic_player_service(player_id):
                                               weekly_stats)
         return nsic_player_info
     return nsic_player_info
+
+def get_user_team_roster_service(league_id, user_team_id):
+    """
+    Fetches a user's team roster from the database.
+    :param league_id: The ID of the league.
+    :param user_team_id: The ID of the user's team.
+    """
+    # Initialize empty response objects.
+    conn = connect_to_fantasyDB()
+    cur = conn.cursor()
+    formatted_roster = None
+
+    # Execute queries to get user team roster information.
+    try:
+        # Get league constraints.
+        with open('src/queries/get_league_information.sql', 'r') as sql:
+            query = sql.read()
+        cur.execute(query, (league_id,))
+        league_info_res = cur.fetchone()
+        constraints = league_info_res[1]
+
+        # Get user team roster.
+        with open('src/queries/get_user_team_roster.sql', 'r') as sql:
+            query = sql.read()
+        cur.execute(query, (user_team_id,))
+        res_roster = cur.fetchall()
+        formatted_roster = matchup_roster_creation(res_roster, int(user_team_id), constraints)
+
+    except Exception as e:
+        print(e)
+    finally:
+        cur.close()
+        conn.close()
+    return formatted_roster
 
 def add_nsic_player_to_roster_service(player_id, user_team_id, league_id):
     """
@@ -240,6 +276,126 @@ def move_nsic_players_on_roster_service(user_team_id, league_id, player_id_1, pl
         
     except Exception as e:
         print(e)
+        response.message = str(e)
+        return response
+    finally:
+        cur.close()
+        conn.close()
+    return response
+
+def submit_waiver_wire_claim_service(user_team_id, league_id, player_add, player_remove = None):
+    """
+    Submits a waiver wire claim.
+    :param user_team_id: The ID of the user's team.
+    :param league_id: The ID of the league.
+    :param player_add: The ID of the player to add.
+    :param player_remove: The ID of the player to remove.
+    """
+    # Initialize empty response object and connection.
+    conn = connect_to_fantasyDB()
+    cur = conn.cursor()
+    response = ConfirmationResponse(False, "Failed to submit waiver wire claim.")
+
+    # Execute queries to determine if waiver wire claim can be submitted.
+    # if they can, submit the claim. Otherwise, return a failure response.
+    try:
+        # CASE 1: Does NSIC player_id exist?
+        if player_add is None:
+            response.message = "Failed to submit waiver claim. Added player cannot be null."
+            return response
+        if player_add == player_remove:
+            response.message = "Failed to submit waiver claim, Added and Removed player cannot be the same."
+            return response
+        with open('src/queries/check_nsic_player_exists.sql', 'r') as sql:
+            query = sql.read()
+        cur.execute(query, (player_add,))
+        player_res = cur.fetchone()
+        if player_res is None:
+            response.message = "Failed to submit waiver claim. Added player does not exist."
+            return response
+        
+        # CASE 2: is the added player already taken?
+        with open('src/queries/check_if_nsic_player_is_taken.sql', 'r') as sql:
+            query = sql.read()
+        cur.execute(query, (league_id, player_add))
+        player_add_res = cur.fetchone()
+        if player_add_res is not None:
+            response.message = "Failed to submit waiver claim. Added player is not available."
+            return response
+        
+        # CASE 3: is the removed player on the user's roster?
+        if player_remove is not None:
+            with open('src/queries/check_nsic_player_on_roster.sql', 'r') as sql:
+                query = sql.read()
+            cur.execute(query, (user_team_id, player_remove, league_id))
+            player_remove_res = cur.fetchone()
+            if player_remove_res is None:
+                response.message = "Failed to submit waiver claim. Removed player is not on your roster."
+                return response
+        
+        # If all cases pass, submit waiver wire claim.
+        with open('src/queries/waiver_wire_submit_claim.sql', 'r') as sql:
+            query = sql.read()
+        cur.execute(query, (league_id, user_team_id, player_add, player_remove))
+        conn.commit()
+        response.success = True
+        response.message = "Waiver wire claim submitted successfully."
+        
+    except Exception as e:
+        print(e)
+        response.message = str(e)
+        return response
+    finally:
+        cur.close()
+        conn.close()
+    return response
+
+def delete_waiver_wire_claim_service(user_team_id, league_id, player_add, player_remove = None):
+    """
+    Deletes a waiver wire claim.
+    :param user_team_id: The ID of the user's team.
+    :param league_id: The ID of the league.
+    :param player_add: The ID of the player to add.
+    :param player_remove: The ID of the player to remove.
+    """
+    # Initialize empty response object and connection.
+    conn = connect_to_fantasyDB()
+    cur = conn.cursor()
+    response = ConfirmationResponse(False, "Failed to delete waiver wire claim.")
+
+    # Execute queries to determine if waiver wire claim can be deleted.
+    # if they can, delete the claim. Otherwise, return a failure response.
+    try:
+        # CASE 1: Is the waiver wire claim valid?
+        if player_remove is not None:
+            with open('src/queries/waiver_wire_check_valid_claim.sql', 'r') as sql:
+                query = sql.read()
+            cur.execute(query, (league_id, user_team_id, player_add, player_remove))
+        else:
+            with open('src/queries/waiver_wire_check_valid_null.sql', 'r') as sql:
+                query = sql.read()
+            cur.execute(query, (league_id, user_team_id, player_add))
+        if cur.fetchone() is None:
+            response.message = "Failed to delete waiver wire claim. Invalid waiver wire claim."
+            return response
+        
+        # If all cases pass, delete waiver wire claim.
+        if player_remove is not None:
+            with open('src/queries/waiver_wire_delete_claim.sql', 'r') as sql:
+                query = sql.read()
+            cur.execute(query, (league_id, user_team_id, player_add, player_remove))
+        else:
+            with open('src/queries/waiver_wire_delete_claim_null.sql', 'r') as sql:
+                query = sql.read()
+            cur.execute(query, (league_id, user_team_id, player_add))
+        conn.commit()
+        response.success = True
+        response.message = "Waiver wire claim deleted successfully."
+
+    except Exception as e:
+        print(e)
+        response.message = str(e)
+        return response
     finally:
         cur.close()
         conn.close()
