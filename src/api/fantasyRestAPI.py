@@ -90,6 +90,13 @@ def get_standings_info():
     league_id = request.args.get('league_id')
     return standings_information_service(league_id).toJson()
 
+@app.route('/db/getDraftBoardInfo', methods=['GET'])
+def get_draft_board_info():
+    # Fetch draft board information from the database.
+    league_id = request.args.get('league_id')
+    user_team_id = request.args.get('user_team_id')
+    return draft_board_information_service(league_id, user_team_id).toJson()
+
 @app.route('/db/getWaiverWireClaims', methods=['GET'])
 def get_waiver_wire_claims():
     # Fetch waiver wire claims from the database.
