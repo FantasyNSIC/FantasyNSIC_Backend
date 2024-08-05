@@ -269,7 +269,6 @@ def draft_board_information_service(league_id, user_team_id):
             query = sql.read()
         cur.execute(query, (league_id,))
         res_draft_order = cur.fetchall()
-        print(res_draft_order)
         draft_order = [Draft_Order.from_tuple(row) for row in res_draft_order]
 
         # Get available players.

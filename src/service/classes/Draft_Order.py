@@ -11,6 +11,7 @@ class Draft_Order:
                  draft_pick: int,
                  league_id: int,
                  user_team_id: int,
+                 team_name: str,
                  player_id: Optional[NSIC_Player] = None) -> None:
         """
         Initializes a draft order object.
@@ -18,6 +19,7 @@ class Draft_Order:
         self.draft_pick = draft_pick
         self.league_id = league_id
         self.user_team_id = user_team_id
+        self.team_name = team_name
         self.player_id = player_id
 
     @property
@@ -69,6 +71,22 @@ class Draft_Order:
         self._user_team_id = user_team_id
 
     @property
+    def team_name(self) -> str:
+        """
+        Returns the team name.
+        """
+        return self._team_name
+    
+    @team_name.setter
+    def team_name(self, team_name: str) -> None:
+        """
+        Sets the team name.
+        """
+        if not isinstance(team_name, str):
+            raise ValueError("Team name must be a string.")
+        self._team_name = team_name
+
+    @property
     def player_id(self) -> Optional[NSIC_Player]:
         """
         Returns the player id.
@@ -93,6 +111,7 @@ class Draft_Order:
                 'draft_pick': self._draft_pick,
                 'league_id': self._league_id,
                 'user_team_id': self._user_team_id,
+                'team_name': self._team_name,
                 'player_id': self._player_id.to_json()
             }
         else:
@@ -100,6 +119,7 @@ class Draft_Order:
                 'draft_pick': self._draft_pick,
                 'league_id': self._league_id,
                 'user_team_id': self._user_team_id,
+                'team_name': self._team_name,
                 'player_id': None
             }
         
@@ -108,17 +128,18 @@ class Draft_Order:
         """
         Creates a draft order object from a tuple.
         """
-        print(draft_order_tuple[3])
-        if draft_order_tuple[3] is None:
+        if draft_order_tuple[4] is None:
             return Draft_Order(
                 draft_order_tuple[0],
                 draft_order_tuple[1],
-                draft_order_tuple[2]
+                draft_order_tuple[2],
+                draft_order_tuple[3]
             )
         else:
             return Draft_Order(
                 draft_order_tuple[0],
                 draft_order_tuple[1],
                 draft_order_tuple[2],
-                NSIC_Player.from_tuple(draft_order_tuple[3:])
+                draft_order_tuple[3],
+                NSIC_Player.from_tuple(draft_order_tuple[4:])
             )
