@@ -3,7 +3,6 @@
 from ..util.connection import connect_to_fantasyDB
 from .classes.NSIC_Player import NSIC_Player
 from .classes.NSIC_Team import NSIC_Team
-from .classes.User_Roster import UserRoster
 from .classes.Player_Stats_2023 import Player_Stats_2023
 from .classes.Player_Stats_Week import Player_Stats_Week
 from .classes.responses.NSICPlayerResponse import NSICPlayerResponse
@@ -282,6 +281,52 @@ def move_nsic_players_on_roster_service(user_team_id, league_id, player_id_1, pl
         cur.close()
         conn.close()
     return response
+
+def draft_nsic_player_to_roster_service(player_id, draft_pick, user_team_id, league_id):
+    """
+    Drafts a NSIC player to a user's roster.
+    :param player_id: The ID of the player.
+    :param user_team_id: The ID of the user's team.
+    :param league_id: The ID of the league.
+    """
+    # Initialize empty response object.
+    response_draft = ConfirmationResponse(False, "Failed to draft player to roster.")
+    conn = connect_to_fantasyDB()
+    cur = conn.cursor()
+
+    try:
+        # First, check to see if draft pick is valid.
+        with open('src/queries/check_draft_pick_is_valid.sql', 'r') as sql:
+            query = sql.read()
+        cur.execute(query, (draft_pick, league_id, user_team_id))
+        pick = cur.fetchone()
+        if pick is None:
+            response_draft.message = "Failed to draft player to roster. Invalid draft pick."
+            return response_draft
+        elif pick[3] is not None:
+            response_draft.message = "Failed to draft player to roster. Draft pick has already been used."
+            return response_draft
+        
+        # Then, attempt to add drafted player to roster.
+        response_add = add_nsic_player_to_roster_service(player_id, user_team_id, league_id)
+
+        # If the player was successfully added to the roster, add drafted player to draft pick.
+        if response_add.success:
+            with open('src/queries/update_draft_order_pick.sql', 'r') as sql:
+                query = sql.read()
+            cur.execute(query, (player_id, draft_pick, league_id, user_team_id))
+            conn.commit()
+            response_draft.success = True
+            response_draft.message = "Player drafted to roster successfully."
+        else:
+            response_draft.message = response_add.message
+    except Exception as e:
+        print(e)
+        response_draft.message = str(e)
+    finally:
+        cur.close()
+        conn.close()
+    return response_draft
 
 def submit_waiver_wire_claim_service(user_team_id, league_id, player_add, player_remove = None):
     """
