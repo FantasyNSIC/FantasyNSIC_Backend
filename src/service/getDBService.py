@@ -256,7 +256,7 @@ def draft_board_information_service(league_id, user_team_id):
     :param user_team_id: The ID of the user's team.
     """
     # Initialize empty response object.
-    draft_board_info = DraftBoardResponse([], [], UserRoster())
+    draft_board_info = DraftBoardResponse([], [], UserRoster(), False)
     draft_order = []
     formatted_roster = UserRoster()
     conn = connect_to_fantasyDB()
@@ -272,10 +272,20 @@ def draft_board_information_service(league_id, user_team_id):
         draft_order = [Draft_Order.from_tuple(row) for row in res_draft_order]
 
         # Get available players.
-        available_players = available_players_service(league_id)
+        with open('src/queries/get_available_players.sql', 'r') as sql:
+            query = sql.read()
+        cur.execute(query, (league_id,))
+        res_fetched_players = cur.fetchall()
+        available_players = AvailablePlayersResponse.from_tuple(res_fetched_players)
 
         # Get user's team roster.
         formatted_roster = get_user_team_roster_service(league_id, user_team_id)
+
+        # Get draft enable status.
+        with open('src/queries/get_draft_properties.sql', 'r') as sql:
+            query = sql.read()
+        cur.execute(query, (league_id,))
+        draft_enable = cur.fetchone()[0]
 
     except Exception as e:
         print(e)
@@ -283,7 +293,7 @@ def draft_board_information_service(league_id, user_team_id):
         cur.close()
         conn.close()
     if len(draft_order) is not 0:
-        draft_board_info = DraftBoardResponse(draft_order, available_players.players, formatted_roster)
+        draft_board_info = DraftBoardResponse(draft_order, available_players.players, formatted_roster, draft_enable)
         return draft_board_info
     return draft_board_info
 
