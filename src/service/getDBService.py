@@ -258,7 +258,9 @@ def draft_board_information_service(league_id, user_team_id):
     # Initialize empty response object.
     draft_board_info = DraftBoardResponse([], [], UserRoster(), False)
     draft_order = []
+    available_players = AvailablePlayersResponse([])
     formatted_roster = UserRoster()
+    draft_enable = False
     conn = connect_to_fantasyDB()
     cur = conn.cursor()
 
@@ -271,6 +273,14 @@ def draft_board_information_service(league_id, user_team_id):
         res_draft_order = cur.fetchall()
         draft_order = [Draft_Order.from_tuple(row) for row in res_draft_order]
 
+        # Get league constraints.
+        with open('src/queries/get_draft_league_information.sql', 'r') as sql:
+            query = sql.read()
+        cur.execute(query, (league_id,))
+        league_info_res = cur.fetchone()
+        constraints = league_info_res[1]
+        draft_enable = league_info_res[2]
+
         # Get available players.
         with open('src/queries/get_available_players.sql', 'r') as sql:
             query = sql.read()
@@ -278,14 +288,12 @@ def draft_board_information_service(league_id, user_team_id):
         res_fetched_players = cur.fetchall()
         available_players = AvailablePlayersResponse.from_tuple(res_fetched_players)
 
-        # Get user's team roster.
-        formatted_roster = get_user_team_roster_service(league_id, user_team_id)
-
-        # Get draft enable status.
-        with open('src/queries/get_draft_properties.sql', 'r') as sql:
+        # Get user team roster.
+        with open('src/queries/get_user_team_roster.sql', 'r') as sql:
             query = sql.read()
-        cur.execute(query, (league_id,))
-        draft_enable = cur.fetchone()[0]
+        cur.execute(query, (user_team_id,))
+        res_roster = cur.fetchall()
+        formatted_roster = matchup_roster_creation(res_roster, int(user_team_id), constraints)
 
     except Exception as e:
         print(e)
