@@ -1,0 +1,11 @@
+venv/
+env/
+user/
+.git/
+.github/
+.gitignore
+*.pyc
+.pytest_cache/
+pyproject.toml
+flask_session/
+__pycache__/
