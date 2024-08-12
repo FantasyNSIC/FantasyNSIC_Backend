@@ -3,16 +3,19 @@
 from ..util.connection import connect_to_fantasyDB
 from .classes.User_Roster import UserRoster
 from .classes.Team_Record import Team_Record
+from .classes.Draft_Order import Draft_Order
 from .classes.responses.MyTeamInfoResponse import MyTeamInfoResponse
 from .classes.responses.AvailablePlayersResponse import AvailablePlayersResponse
 from .classes.responses.MatchupInfoResponse import MatchupInfoResponse
 from .classes.responses.ScoreboardInfoResponse import ScoreboardInfoResponse
 from .classes.responses.LeagueInfoResponse import LeagueInfoResponse
 from .classes.responses.StandingsInfoResponse import StandingsInfoResponse
+from .classes.responses.DraftBoardResponse import DraftBoardResponse
 from .classes.responses.WaiverWiresResponse import WaiverWiresResponse
 from .service_handlers.myTeamRosterHandle import handle_roster_creation
 from .service_handlers.matchupRosterHandle import matchup_roster_creation
 from .service_handlers.scoreboardMatchupHandle import format_weekly_matchups
+from .postDBService import get_user_team_roster_service
 
 def my_team_information_service(user_team_id):
     """
@@ -245,6 +248,62 @@ def standings_information_service(league_id):
         conn.close()
     standings = StandingsInfoResponse.from_tuple(fetched_standings)
     return standings
+
+def draft_board_information_service(league_id, user_team_id):
+    """
+    Fetches draft board information from the database.
+    :param league_id: The ID of the user's league.
+    :param user_team_id: The ID of the user's team.
+    """
+    # Initialize empty response object.
+    draft_board_info = DraftBoardResponse([], [], UserRoster(), False)
+    draft_order = []
+    available_players = AvailablePlayersResponse([])
+    formatted_roster = UserRoster()
+    draft_enable = False
+    conn = connect_to_fantasyDB()
+    cur = conn.cursor()
+
+    # Execute queries and functions to get draft board information.
+    try:
+        # Get draft order.
+        with open('src/queries/get_draft_order.sql', 'r') as sql:
+            query = sql.read()
+        cur.execute(query, (league_id,))
+        res_draft_order = cur.fetchall()
+        draft_order = [Draft_Order.from_tuple(row) for row in res_draft_order]
+
+        # Get league constraints.
+        with open('src/queries/get_draft_league_information.sql', 'r') as sql:
+            query = sql.read()
+        cur.execute(query, (league_id,))
+        league_info_res = cur.fetchone()
+        constraints = league_info_res[1]
+        draft_enable = league_info_res[2]
+
+        # Get available players.
+        with open('src/queries/get_available_players.sql', 'r') as sql:
+            query = sql.read()
+        cur.execute(query, (league_id,))
+        res_fetched_players = cur.fetchall()
+        available_players = AvailablePlayersResponse.from_tuple(res_fetched_players)
+
+        # Get user team roster.
+        with open('src/queries/get_user_team_roster.sql', 'r') as sql:
+            query = sql.read()
+        cur.execute(query, (user_team_id,))
+        res_roster = cur.fetchall()
+        formatted_roster = matchup_roster_creation(res_roster, int(user_team_id), constraints)
+
+    except Exception as e:
+        print(e)
+    finally:
+        cur.close()
+        conn.close()
+    if len(draft_order) is not 0:
+        draft_board_info = DraftBoardResponse(draft_order, available_players.players, formatted_roster, draft_enable)
+        return draft_board_info
+    return draft_board_info
 
 def waiver_wire_claims_service(user_team_id, league_id):
     """

@@ -90,6 +90,13 @@ def get_standings_info():
     league_id = request.args.get('league_id')
     return standings_information_service(league_id).toJson()
 
+@app.route('/db/getDraftBoardInfo', methods=['GET'])
+def get_draft_board_info():
+    # Fetch draft board information from the database.
+    league_id = request.args.get('league_id')
+    user_team_id = request.args.get('user_team_id')
+    return draft_board_information_service(league_id, user_team_id).toJson()
+
 @app.route('/db/getWaiverWireClaims', methods=['GET'])
 def get_waiver_wire_claims():
     # Fetch waiver wire claims from the database.
@@ -134,6 +141,15 @@ def move_nsic_players_on_roster():
     player_id_1 = request.json['player_id_1']
     player_id_2 = request.json['player_id_2']
     return move_nsic_players_on_roster_service(user_team_id, league_id, player_id_1, player_id_2).toJson()
+
+@app.route('/rq/draftNSICPlayerToRoster', methods=['POST'])
+def draft_nsic_player_to_roster():
+    # Draft a NSIC player to a user's roster.
+    player_id = request.json['player_id']
+    draft_pick = request.json['draft_pick']
+    user_team_id = request.json['user_team_id']
+    league_id = request.json['league_id']
+    return draft_nsic_player_to_roster_service(player_id, draft_pick, user_team_id, league_id).toJson()
 
 @app.route('/rq/submitWaiverWireClaim', methods=['POST'])
 def submit_waiver_wire_claim():
