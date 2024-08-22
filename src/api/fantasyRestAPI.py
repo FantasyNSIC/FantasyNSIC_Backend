@@ -4,6 +4,7 @@ from datetime import timedelta
 from flask import Flask, request, session
 from flask_cors import CORS
 from flask_session import Session
+from flask_socketio import SocketIO, emit
 from ..util.logger import Logger
 from ..service.authService import *
 from ..service.getDBService import *
@@ -21,6 +22,8 @@ app.config["SESSION_COOKIE_SAMESITE"] = "None"
 app.config["SESSION_COOKIE_HTTPONLY"] = True
 app.config["SESSION_COOKIE_SECURE"] = True
 Session(app)
+
+socketio = SocketIO(app, cors_allowed_origins="*")
 
 @app.route('/auth/login', methods=['POST'])
 def login():
@@ -169,5 +172,20 @@ def delete_waiver_wire_claim():
     player_remove = request.json['player_remove']
     return delete_waiver_wire_claim_service(user_team_id, league_id, player_add, player_remove).toJson()
 
+@socketio.on('connect')
+def handle_connect():
+    logger.info('Client connected to the server.')
+    emit('connection', {'message': 'Connected to the server.'})
+
+@socketio.on('disconnect')
+def handle_disconnect():
+    logger.info('Client disconnected from the server.')
+    emit('connection', {'message': 'Disconnected from the server.'})
+
+@socketio.on('message')
+def handle_message(data):
+    logger.info('Message received: ' + data)
+    emit('message', data)
+
 if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=5001, debug=True, ssl_context=('/certB.pem', '/keyB.pem'))
+    socketio.run(app, host='0.0.0.0', port=5001, debug=True, ssl_context=('/certB.pem', '/keyB.pem'))
