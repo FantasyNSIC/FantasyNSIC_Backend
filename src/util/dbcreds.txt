@@ -1,5 +1,5 @@
-host=aws-0-us-east-1.pooler.supabase.com
-port=5432
-database=postgres
-username=postgres.ifgljiavzphnnknkezjo
-password=26MavTime26!
+host=<HOST>
+port=<PORT>
+database=<DATABASE>
+username=<USERNAME>
+password=<PASSWORD>
