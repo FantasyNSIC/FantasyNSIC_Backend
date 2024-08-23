@@ -175,17 +175,16 @@ def delete_waiver_wire_claim():
 @socketio.on('connect')
 def handle_connect():
     logger.info('Client connected to the server.')
-    emit('connection', {'message': 'Connected to the server.'})
 
 @socketio.on('disconnect')
 def handle_disconnect():
     logger.info('Client disconnected from the server.')
-    emit('connection', {'message': 'Disconnected from the server.'})
+    emit('disconnect')
 
-@socketio.on('message')
+@socketio.on('draft_submit')
 def handle_message(data):
-    logger.info('Message received: ' + data)
-    emit('message', data)
+    logger.info('Pick received: ' + str(data))
+    emit('draft_update')
 
 if __name__ == '__main__':
     socketio.run(app, host='0.0.0.0', port=5001, debug=True, ssl_context=('/certB.pem', '/keyB.pem'))
