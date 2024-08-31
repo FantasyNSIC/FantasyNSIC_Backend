@@ -99,6 +99,37 @@ def get_user_team_roster_service(league_id, user_team_id):
         conn.close()
     return formatted_roster
 
+def get_nsic_player_weekly_stats_service(player_id, week):
+    """
+    Fetches weekly statistics for a NSIC player from the database.
+    :param player_id: The ID of the player.
+    :param week: The week number.
+    """
+    # Initialize empty response object.
+    weekly_stats = Player_Stats_Week.empty()
+    conn = connect_to_fantasyDB()
+    cur = conn.cursor()
+    week = "week_" + str(week)
+
+    # Execute queries to get player weekly statistics.
+    try:
+        with open('src/queries/get_nsic_single_week_stats.sql', 'r') as sql:
+            query_temp = sql.read()
+        query = query_temp.format(week=week)
+        cur.execute(query, (player_id,))
+        res_weekly_stats = cur.fetchone()
+        if res_weekly_stats is not None:
+            weekly_stats = Player_Stats_Week.from_tuple(res_weekly_stats)
+
+    except Exception as e:
+        print(e)
+    finally:
+        cur.close()
+        conn.close()
+    if weekly_stats is not None:
+        return weekly_stats
+    return weekly_stats
+
 def add_nsic_player_to_roster_service(player_id, user_team_id, league_id):
     """
     Adds a NSIC player to a user's roster.

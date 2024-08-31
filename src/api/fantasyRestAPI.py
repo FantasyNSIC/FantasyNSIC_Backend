@@ -120,6 +120,13 @@ def get_user_team_roster():
     user_team_id = request.json['user_team_id']
     return get_user_team_roster_service(league_id, user_team_id).to_json()
 
+@app.route('/db/getNSICPlayerWeeklyStats', methods=['POST'])
+def get_nsic_player_weekly_stats():
+    # Fetch player weekly stats from the database.
+    player_id = request.json['player_id']
+    week = request.json['week']
+    return get_nsic_player_weekly_stats_service(player_id, week).to_json()
+
 @app.route('/rq/addNSICPlayerToRoster', methods=['POST'])
 def add_nsic_player_to_roster():
     # Add a NSIC player to a user's roster.
