@@ -347,6 +347,31 @@ class Player_Stats_Week:
             return {
                 "week_points": self.week_points,
             }
+        
+    @classmethod
+    def empty(cls) -> "Player_Stats_Week":
+        """
+        Returns an empty player statistics object.
+        """
+        return cls(
+            player_id=0,
+            rush_att=0,
+            rush_yds=0,
+            rush_avg=0.0,
+            rush_td=0,
+            pass_comp=0,
+            pass_att=0,
+            pass_yds=0,
+            pass_td=0,
+            pass_int=0,
+            recieve_rec=0,
+            recieve_yds=0,
+            recieve_avg=0.0,
+            recieve_td=0,
+            fg_att=0,
+            fg_made=0,
+            week_points=0.0
+        )
     
     def to_json(self) -> dict:
         """
