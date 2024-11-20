@@ -107,6 +107,12 @@ def get_waiver_wire_claims():
     league_id = request.args.get('league_id')
     return waiver_wire_claims_service(user_team_id, league_id).toJson()
 
+@app.route('/db/getUserTeamInfo', methods=['POST'])
+def get_user_team_information():
+    # fetches team information and roster from POST request
+    user_team_id = request.json['user_team_id']
+    return my_team_information_service(user_team_id).toJson()
+
 @app.route('/db/getNSICPlayerInfo', methods=['POST'])
 def get_nsic_player_info():
     # Fetch player information from the database.
